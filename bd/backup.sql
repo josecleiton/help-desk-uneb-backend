@@ -39,7 +39,7 @@ CREATE TABLE `talteracao` (
   CONSTRAINT `talteracao_tprioridade_id_fk` FOREIGN KEY (`id_prioridade`) REFERENCES `tprioridade` (`id`),
   CONSTRAINT `talteracao_tsituacao_id_fk` FOREIGN KEY (`id_situacao`) REFERENCES `tsituacao` (`id`),
   CONSTRAINT `talteracao_ttecnico_login_fk` FOREIGN KEY (`id_tecnico`) REFERENCES `ttecnico` (`login`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,6 +48,7 @@ CREATE TABLE `talteracao` (
 
 LOCK TABLES `talteracao` WRITE;
 /*!40000 ALTER TABLE `talteracao` DISABLE KEYS */;
+INSERT INTO `talteracao` VALUES (2,'2019-08-16','Teste alteração','test',2,1,1);
 /*!40000 ALTER TABLE `talteracao` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -64,7 +65,7 @@ CREATE TABLE `tchamado` (
   `data` date NOT NULL,
   `ti` tinyint(1) NOT NULL,
   `tombo` varchar(20) NOT NULL,
-  `id_observacao` int(11) NOT NULL,
+  `id_observacao` int(11) DEFAULT NULL,
   `id_tecnico` varchar(20) NOT NULL,
   `id_usuario` varchar(11) NOT NULL,
   `id_setor` int(11) NOT NULL,
@@ -77,7 +78,7 @@ CREATE TABLE `tchamado` (
   CONSTRAINT `tchamado_tsetor_id_fk` FOREIGN KEY (`id_setor`) REFERENCES `tsetor` (`id`),
   CONSTRAINT `tchamado_ttecnico_login_fk` FOREIGN KEY (`id_tecnico`) REFERENCES `ttecnico` (`login`),
   CONSTRAINT `tchamado_tusuario_cpf_fk` FOREIGN KEY (`id_usuario`) REFERENCES `tusuario` (`cpf`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,6 +87,7 @@ CREATE TABLE `tchamado` (
 
 LOCK TABLES `tchamado` WRITE;
 /*!40000 ALTER TABLE `tchamado` DISABLE KEYS */;
+INSERT INTO `tchamado` VALUES (2,'um chamado de teste','2019-08-16',0,'111111',NULL,'test','12345678901',1);
 /*!40000 ALTER TABLE `tchamado` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -100,7 +102,7 @@ CREATE TABLE `tcor` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `hex` varchar(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -109,6 +111,7 @@ CREATE TABLE `tcor` (
 
 LOCK TABLES `tcor` WRITE;
 /*!40000 ALTER TABLE `tcor` DISABLE KEYS */;
+INSERT INTO `tcor` VALUES (1,'ffffff');
 /*!40000 ALTER TABLE `tcor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -149,7 +152,7 @@ CREATE TABLE `tprioridade` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,6 +161,7 @@ CREATE TABLE `tprioridade` (
 
 LOCK TABLES `tprioridade` WRITE;
 /*!40000 ALTER TABLE `tprioridade` DISABLE KEYS */;
+INSERT INTO `tprioridade` VALUES (1,'Alta');
 /*!40000 ALTER TABLE `tprioridade` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -200,7 +204,7 @@ CREATE TABLE `tsetor` (
   `telefone` varchar(11) NOT NULL,
   `email` varchar(80) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -209,6 +213,7 @@ CREATE TABLE `tsetor` (
 
 LOCK TABLES `tsetor` WRITE;
 /*!40000 ALTER TABLE `tsetor` DISABLE KEYS */;
+INSERT INTO `tsetor` VALUES (1,'test','71999999999','test1@test.com');
 /*!40000 ALTER TABLE `tsetor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -226,7 +231,7 @@ CREATE TABLE `tsituacao` (
   PRIMARY KEY (`id`),
   KEY `tsituacao_tcor_id_fk` (`id_cor`),
   CONSTRAINT `tsituacao_tcor_id_fk` FOREIGN KEY (`id_cor`) REFERENCES `tcor` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,6 +240,7 @@ CREATE TABLE `tsituacao` (
 
 LOCK TABLES `tsituacao` WRITE;
 /*!40000 ALTER TABLE `tsituacao` DISABLE KEYS */;
+INSERT INTO `tsituacao` VALUES (1,'Em shokk',1);
 /*!40000 ALTER TABLE `tsituacao` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -264,6 +270,7 @@ CREATE TABLE `ttecnico` (
 
 LOCK TABLES `ttecnico` WRITE;
 /*!40000 ALTER TABLE `ttecnico` DISABLE KEYS */;
+INSERT INTO `ttecnico` VALUES ('test','Testando','test@test.com','71999999999',NULL,1);
 /*!40000 ALTER TABLE `ttecnico` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -289,7 +296,7 @@ CREATE TABLE `tusuario` (
 
 LOCK TABLES `tusuario` WRITE;
 /*!40000 ALTER TABLE `tusuario` DISABLE KEYS */;
-INSERT INTO `tusuario` VALUES ('12345678901','bla@bla.com',NULL);
+INSERT INTO `tusuario` VALUES ('12345678901','bla@bla.com','77777777777');
 /*!40000 ALTER TABLE `tusuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -302,4 +309,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-16  0:27:18
+-- Dump completed on 2019-08-17  1:06:27

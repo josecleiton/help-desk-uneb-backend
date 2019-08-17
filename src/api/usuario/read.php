@@ -19,17 +19,38 @@ function isCPF($cpf) {
    return false;
 }
 
+$EMAIL = $_POST["email"];
 $CPF = $_POST["cpf"];
 // $CPF = "12345678901";
-if(!isCPF($CPF)) {
-   http_response_code(401);
+// $EMAIL = "bla@bla.com";
+$usuario = new Usuario();
+if($CPF) {
+   if(!isCPF($CPF)) {
+      http_response_code(401);
+      echo json_encode(array(
+         "error" => "CPF inválido."
+      ));
+      return null;
+   }
+   $usuario->setCPF($CPF);
+} else if($EMAIL) {
+   if(!filter_var($EMAIL, FILTER_VALIDATE_EMAIL)) {
+      http_response_code(401);
+      echo json_encode(array(
+         "error" => "Email inválido."
+      ));
+      return null;
+   }
+   $usuario->setEmail($EMAIL);
+
+} else {
+   http_response_code(400);
    echo json_encode(array(
-      "error" => "CPF inválido."
+      "error" => "Necessita-se de CPF ou Email."
    ));
    return null;
 }
 
-$usuario = new Usuario($CPF);
 if($status = $usuario->read()[1]) {
    echo json_encode($usuario->getJSON());
 } else {

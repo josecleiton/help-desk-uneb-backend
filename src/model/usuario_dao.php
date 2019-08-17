@@ -10,8 +10,11 @@ class UsuarioDAO extends DAO {
 
    public function read($usuario) {
 
+      $cpfUsuario = $usuario->getCPF();
       $query = "SELECT * FROM " . self::TABLE .
-               " WHERE cpf = ". $usuario->getCPF();
+               " WHERE " . (($cpfUsuario) ? ("cpf = " . $cpfUsuario) :
+                           ("email = '" . $usuario->getEmail() . "'"));
+      echo $query . "\n";
       $resultadoDB = $this->conn->prepare($query);
       $resultadoDB->execute();
       $encontrado = false;
@@ -19,7 +22,10 @@ class UsuarioDAO extends DAO {
          $encontrado = true;
          $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
          extract($row);
-         $usuario->setEmail($email);
+         if($cpfUsuario) 
+            $usuario->setEmail($email);
+         else
+            $usuario->setCPF($cpf);
          $usuario->setTelefone($telefone);
          // busque os chamados
          $chamadoDAO = new ChamadoDAO();

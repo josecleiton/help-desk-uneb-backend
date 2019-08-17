@@ -8,10 +8,6 @@ class Usuario {
     protected $telefone;
     protected $chamados;
 
-    function __construct($cpf) {
-       $this->cpf = $cpf;
-    }
-
     private function cancelaChamado($chamado) {
 
     }
@@ -44,6 +40,10 @@ class Usuario {
        return array_map(function ($chamado) {
           return $chamado->getJSON();
        }, $this->getChamados());
+    }
+
+    public function setCPF($cpf) {
+       $this->cpf = $cpf;
     }
 
     public function setNome($nome) {
