@@ -14,7 +14,7 @@ class UsuarioDAO extends DAO {
       $query = "SELECT * FROM " . self::TABLE .
                " WHERE " . (($cpfUsuario) ? ("cpf = " . $cpfUsuario) :
                            ("email = '" . $usuario->getEmail() . "'"));
-      echo $query . "\n";
+      // echo $query . "\n";
       $resultadoDB = $this->conn->prepare($query);
       $resultadoDB->execute();
       $encontrado = false;
