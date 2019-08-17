@@ -16,6 +16,12 @@ class Prioridade {
       return $this->descricao;
    }
 
+   public function getJSON() {
+      return array(
+         "descricao" => $this->getDescricao()
+      );
+   }
+
    public function setDescricao($descricao) {
       $this->descricao = $descricao;
    }

@@ -6,6 +6,7 @@ class Tecnico extends Usuario {
     protected $login;
     protected $setor;
     protected $chamados;
+    protected $authKey;
 
     function __construct($login) {
        $this->login = $login;
@@ -25,15 +26,6 @@ class Tecnico extends Usuario {
        }
     }
 
-    public function setSetor($setor) {
-       $this->setor = $setor;
-    }
-
-    public function read() {
-       $dao = new TecnicoDAO();
-       return $dao->read($this);
-    }
-
     public function getChamados() {
        if($this->chamados) {
           return $this->chamados;
@@ -44,6 +36,32 @@ class Tecnico extends Usuario {
        }
     }
 
+    public function getAuthKey() {
+       return $this->authKey;
+    }
+
+    public function getJSON() {
+       $json = parent::getJSON();
+       $json["login"] = $this->getLogin();
+       return $json;
+    }
+
+    public function setSetor($setor) {
+       $this->setor = $setor;
+    }
+
+    public function setAuthKey($authKey) {
+       $this->authKey = $authKey;
+    }
+
+    public function setChamados($chamados) {
+       $this->chamados = $chamados;
+    }
+
+    public function read() {
+       $dao = new TecnicoDAO();
+       return $dao->read($this);
+    }
 
     public function atendeChamado($chamado) {
 

@@ -13,6 +13,16 @@ class Alteracao {
 
    }
 
+   public function getJSON() {
+      return array(
+         "descricao" => $this->getDescricao(),
+         "data" => $this->getData(),
+         "situacao" => $this->getSituacao()->getJSON(),
+         "prioridade" => $this->getPrioridade()->getJSON(),
+      );
+      
+   }
+
    public function getID() {
       return $this->id;
    }

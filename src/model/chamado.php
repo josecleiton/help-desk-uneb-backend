@@ -10,7 +10,6 @@ class Chamado {
     protected $usuario;
     protected $setor;
     protected $tecnico;
-    protected $observacao;
 
     function __construct($id) {
        $this->id = $id;
@@ -50,6 +49,31 @@ class Chamado {
        return $this->tecnico;
     }
 
+    public function getAlteracoes() {
+       return $this->alteracoes;
+    }
+
+    protected function getAlteracoesJSON() {
+       return array_map(function ($alteracao){
+          return $alteracao->getJSON();
+       }, $this->getAlteracoes());
+    }
+
+    public function getJSON() {
+      $usuario = $this->getUsuario();
+      $tecnico = $this->getTecnico();
+      return array(
+         "id" => $this->getID(),
+         "descricao" => $this->getDescricao(),
+         "data" => $this->getData(),
+         "alteracoes" => $this->getAlteracoesJSON(),
+         "usuario" => ($usuario) ? $usuario->getJSON() : null,
+         "tecnico" => ($tecnico) ? $tecnico->getJSON() : null,
+         "tombo" => $this->getTombo(),
+         "setor" => $this->getSetor()->getJSON(),
+      );
+    }
+
     public function setDescricao($descricao) {
        $this->descricao = $descricao;
     }
@@ -72,6 +96,10 @@ class Chamado {
 
     public function setTecnico($tecnico) {
        $this->tecnico = $tecnico;
+    }
+
+    public function setAlteracoes($alteracoes) {
+       $this->alteracoes = $alteracoes;
     }
 }
 

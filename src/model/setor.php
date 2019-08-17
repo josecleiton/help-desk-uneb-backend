@@ -39,6 +39,15 @@ class Setor {
       }
    }
 
+   public function getJSON() {
+      return array(
+         "nome" => $this->nome,
+         "telefone" => $this->tel,
+         "email" => $this->email,
+         "problemas" => $this->problemas,
+      );
+   }
+
    public function setNome($nome) {
       $this->nome = $nome;
    }
@@ -57,7 +66,7 @@ class Setor {
 
    public function read() {
       $dao = new SetorDAO();
-      return $dao->read($this);
+      return $dao->readByID($this);
    }
 
 }

@@ -40,6 +40,12 @@ class Usuario {
        return $this->chamados;
     }
 
+    public function getChamadosJSON() {
+       return array_map(function ($chamado) {
+          return $chamado->getJSON();
+       }, $this->getChamados());
+    }
+
     public function setNome($nome) {
        $this->nome = $nome;
     }
@@ -62,13 +68,12 @@ class Usuario {
     }
 
     public function getJSON() {
-      $usuario_item = array(
+      return array(
          "cpf" => $this->getCPF(),
          "email" => $this->getEmail(),
          "telefone" => $this->getTelefone(),
-         "auth_key" => $this->getAuthKey()
+         "chamados" => $this->getChamadosJSON()
       );
-      return json_encode($usuario_item);
     }
 
 

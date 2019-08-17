@@ -23,6 +23,13 @@ class Situacao {
       return $this->cor;
    }
 
+   public function getJSON() {
+      return array(
+         "nome" => $this->getNome(),
+         "cor" => $this->getCor(),
+      );
+   }
+
    public function setNome($nome) {
       $this->nome = $nome;
    }

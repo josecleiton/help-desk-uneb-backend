@@ -13,7 +13,7 @@ class AlteracaoDAO extends DAO {
       $resultadoDB->execute();
       $alteracoes = array();
       if($resultadoDB->rowCount() > 0) {
-         while(($row = $resultadoDB->fetch(PDO::FETCH_ASSOC)) {
+         while(($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
             extract($row);
             $novaAlteracao = new Alteracao($id);
             $novaAlteracao->setDescricao($descricao);
