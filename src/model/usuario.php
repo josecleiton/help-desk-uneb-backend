@@ -38,7 +38,9 @@ class Usuario {
 
     public function getChamadosJSON() {
        return array_map(function ($chamado) {
-          return $chamado->getJSON();
+          return $chamado->getJSON(array(
+             "usuario" => true
+          ));
        }, $this->getChamados());
     }
 
@@ -72,7 +74,7 @@ class Usuario {
          "cpf" => $this->getCPF(),
          "email" => $this->getEmail(),
          "telefone" => $this->getTelefone(),
-         "chamados" => $this->getChamadosJSON()
+         "chamados" => $this->getChamadosJSON(),
       );
     }
 

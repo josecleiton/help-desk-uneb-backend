@@ -11,13 +11,6 @@ class ChamadoDAO extends DAO {
    protected function read($query) {
       $resultadoDB = $this->conn->prepare($query);
       $resultadoDB->execute();
-      return $resultadoDB;
-   }
-
-   public function readByUsuario($usuario) {
-      $query = "SELECT * FROM " . self::TABLE .
-               " WHERE id_usuario = " . $usuario->getCPF();
-      $resultadoDB = $this->read($query);
       $chamados = array();
       if($resultadoDB->rowCount() > 0) {
          while(($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
@@ -37,14 +30,19 @@ class ChamadoDAO extends DAO {
          }
       }
       return $chamados;
+   }
+
+   public function readByUsuario($usuario) {
+      $query = "SELECT * FROM " . self::TABLE .
+               " WHERE id_usuario = " . $usuario->getCPF();
+      return $this->read($query);
       // QUERY INCOMPLETA
    }
 
    public function readByTecnico($tecnico) {
       $query = "SELECT * FROM " . self::TABLE .
-         "WHERE id_tecnico = " . $tecnico->getLogin();
+         " WHERE id_tecnico = '" . $tecnico->getLogin() . "'";
       return $this->read($query);
-
    }
 }
 

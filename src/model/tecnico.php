@@ -40,10 +40,19 @@ class Tecnico extends Usuario {
        return $this->authKey;
     }
 
-    public function getJSON() {
-       $json = parent::getJSON();
-       $json["login"] = $this->getLogin();
-       return $json;
+    public function getJSON($nullVal) {
+   //  protected $login;
+   //  protected $setor;
+   //  protected $chamados;
+   //  protected $authKey;
+      return array(
+         "login" => $this->getLogin(),
+         "email" => $this->getEmail(),
+         "telefone" => $this->getTelefone(),
+         "setor" => array_key_exists("setor", $nullVal) ? null : $this->getSetor(),
+         "chamados" => array_key_exists("chamados", $nullVal) ? null : $this->getChamados(),
+         "auth_key" => array_key_exists("auth_key", $nullVal) ? null : $this->getAuthKey(),
+      );
     }
 
     public function setSetor($setor) {

@@ -1,6 +1,8 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Methods: POST");
 require_once(dirname(__file__) . "/../../model/usuario.php");
 
 function sumDigit($str, $start_mul, $end) {
@@ -28,7 +30,7 @@ if($CPF) {
    if(!isCPF($CPF)) {
       http_response_code(401);
       echo json_encode(array(
-         "error" => "CPF inválido."
+         "mensagem" => "CPF inválido."
       ));
       return null;
    }
@@ -37,7 +39,7 @@ if($CPF) {
    if(!filter_var($EMAIL, FILTER_VALIDATE_EMAIL)) {
       http_response_code(401);
       echo json_encode(array(
-         "error" => "Email inválido."
+         "mensagem" => "Email inválido."
       ));
       return null;
    }
@@ -46,17 +48,19 @@ if($CPF) {
 } else {
    http_response_code(400);
    echo json_encode(array(
-      "error" => "Necessita-se de CPF ou Email."
+      "mensagem" => "Necessita-se de CPF ou Email."
    ));
    return null;
 }
 
 if($status = $usuario->read()[1]) {
-   echo json_encode($usuario->getJSON());
+   $usuarioJSON = $usuario->getJSON();
+   $usuarioJSON["mensagem"] = "Sucesso";
+   echo json_encode($usuarioJSON);
 } else {
    http_response_code(404);
    echo json_encode(array(
-      "error" => "Usuário não encontrado."
+      "mensagem" => "Usuário não encontrado."
    ));
 }
 

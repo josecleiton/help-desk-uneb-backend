@@ -59,7 +59,7 @@ class Chamado {
        }, $this->getAlteracoes());
     }
 
-    public function getJSON() {
+    public function getJSON($nullVal) {
       $usuario = $this->getUsuario();
       $tecnico = $this->getTecnico();
       return array(
@@ -67,8 +67,11 @@ class Chamado {
          "descricao" => $this->getDescricao(),
          "data" => $this->getData(),
          "alteracoes" => $this->getAlteracoesJSON(),
-         "usuario" => ($usuario) ? $usuario->getJSON() : null,
-         "tecnico" => ($tecnico) ? $tecnico->getJSON() : null,
+         "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(),
+         "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico->getJSON(array(
+            "chamados" => true,
+            "setor" => true,
+         )),
          "tombo" => $this->getTombo(),
          "setor" => $this->getSetor()->getJSON(),
       );
