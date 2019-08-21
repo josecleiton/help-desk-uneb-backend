@@ -78,7 +78,7 @@ CREATE TABLE `tchamado` (
   CONSTRAINT `tchamado_tsetor_id_fk` FOREIGN KEY (`id_setor`) REFERENCES `tsetor` (`id`),
   CONSTRAINT `tchamado_ttecnico_login_fk` FOREIGN KEY (`id_tecnico`) REFERENCES `ttecnico` (`login`),
   CONSTRAINT `tchamado_tusuario_cpf_fk` FOREIGN KEY (`id_usuario`) REFERENCES `tusuario` (`cpf`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -87,7 +87,7 @@ CREATE TABLE `tchamado` (
 
 LOCK TABLES `tchamado` WRITE;
 /*!40000 ALTER TABLE `tchamado` DISABLE KEYS */;
-INSERT INTO `tchamado` VALUES (2,'um chamado de teste','2019-08-16',0,'111111',NULL,'test','12345678901',1);
+INSERT INTO `tchamado` VALUES (2,'um chamado de teste','2019-08-16',1,'111111',NULL,'test','12345678901',1),(3,'test2','2019-08-20',1,'111111',NULL,'test','99999999999',1);
 /*!40000 ALTER TABLE `tchamado` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -256,8 +256,9 @@ CREATE TABLE `ttecnico` (
   `nome` varchar(80) NOT NULL,
   `email` varchar(80) NOT NULL,
   `telefone` varchar(11) DEFAULT NULL,
-  `auth_key` varchar(40) DEFAULT NULL,
+  `auth_key` varchar(250) DEFAULT NULL,
   `id_setor` int(11) NOT NULL,
+  `cargo` char(1) DEFAULT NULL,
   PRIMARY KEY (`login`),
   KEY `ttecnico_tsetor_id_fk` (`id_setor`),
   CONSTRAINT `ttecnico_tsetor_id_fk` FOREIGN KEY (`id_setor`) REFERENCES `tsetor` (`id`)
@@ -270,7 +271,7 @@ CREATE TABLE `ttecnico` (
 
 LOCK TABLES `ttecnico` WRITE;
 /*!40000 ALTER TABLE `ttecnico` DISABLE KEYS */;
-INSERT INTO `ttecnico` VALUES ('test','Testando','test@test.com','71999999999',NULL,1);
+INSERT INTO `ttecnico` VALUES ('test','Testando','test@test.com','71999999999',NULL,1,NULL);
 /*!40000 ALTER TABLE `ttecnico` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -296,7 +297,7 @@ CREATE TABLE `tusuario` (
 
 LOCK TABLES `tusuario` WRITE;
 /*!40000 ALTER TABLE `tusuario` DISABLE KEYS */;
-INSERT INTO `tusuario` VALUES ('12345678901','bla@bla.com','77777777777');
+INSERT INTO `tusuario` VALUES ('12345678901','bla@bla.com','77777777777'),('99999999999','tst@tst.com','99999999999');
 /*!40000 ALTER TABLE `tusuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -309,4 +310,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-17  1:06:27
+-- Dump completed on 2019-08-21 19:32:22
