@@ -9,10 +9,6 @@ class Setor {
    private $email;
    private $problemas;
 
-   function __construct($id) {
-      $this->id = $id;
-   }
-
    public function getID() {
       return $this->id;
    }
@@ -41,11 +37,16 @@ class Setor {
 
    public function getJSON() {
       return array(
+         "cod" => $this->id,
          "nome" => $this->nome,
          "telefone" => $this->tel,
          "email" => $this->email,
          "problemas" => $this->problemas,
       );
+   }
+
+   public function setID($id) {
+      $this->id = $id;
    }
 
    public function setNome($nome) {
@@ -64,9 +65,24 @@ class Setor {
       $this->problemas = $problemas;
    }
 
+   public function create() {
+      $dao = new SetorDAO();
+      return $dao->create($this);
+   }
+
    public function read() {
       $dao = new SetorDAO();
       return $dao->readByID($this);
+   }
+
+   public function readAll() {
+      $dao = new SetorDAO();
+      return $dao->readAll();
+   }
+
+   public function delete() {
+      $dao = new SetorDAO();
+      return $dao->delete($this);
    }
 
 }

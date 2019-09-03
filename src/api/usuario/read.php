@@ -21,39 +21,36 @@ function isCPF($cpf) {
    return false;
 }
 
-$EMAIL = $_POST["email"];
-$CPF = $_POST["cpf"];
-// $CPF = "12345678901";
-// $EMAIL = "bla@bla.com";
+$data = json_decode(file_get_contents("php://input"));
 $usuario = new Usuario();
-if($CPF) {
-   if(!isCPF($CPF)) {
+if(!empty($data->cpf)) {
+   if(!isCPF($data->cpf)) {
       http_response_code(401);
       echo json_encode(array(
          "mensagem" => "CPF inválido."
       ));
-      return null;
+      return false;
    }
-   $usuario->setCPF($CPF);
-} else if($EMAIL) {
-   if(!filter_var($EMAIL, FILTER_VALIDATE_EMAIL)) {
+   $usuario->setCPF($data->cpf);
+} else if(!empty($data->email)) {
+   if(!filter_var($data->email, FILTER_VALIDATE_EMAIL)) {
       http_response_code(401);
       echo json_encode(array(
          "mensagem" => "Email inválido."
       ));
-      return null;
+      return false;
    }
-   $usuario->setEmail($EMAIL);
+   $usuario->setEmail($data->email);
 
 } else {
    http_response_code(400);
    echo json_encode(array(
       "mensagem" => "Necessita-se de CPF ou Email."
    ));
-   return null;
+   return false;
 }
 
-if($status = $usuario->read()[1]) {
+if($usuario->read()) {
    $usuarioJSON = $usuario->getJSON();
    $usuarioJSON["mensagem"] = "Sucesso";
    echo json_encode($usuarioJSON);

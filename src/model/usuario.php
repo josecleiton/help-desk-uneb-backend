@@ -78,6 +78,10 @@ class Usuario {
       );
     }
 
+    public function existe() {
+       $dao = new UsuarioDAO();
+       return $dao->existe($this);
+    }
 
 
 }

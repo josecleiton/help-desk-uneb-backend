@@ -10,11 +10,9 @@ class TecnicoDAO extends DAO {
       $resultadoDB->execute();
       if($resultadoDB->rowCount() == 1) {
          $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
-         extract($row);
-         $tecnico->setNome($nome);
-         $tecnico->setEmail($email);
-         $tecnico->setTelefone($telefone);
-         $tecnico->setAuthKey($auth_key);
+         $tecnico->setNome($row["nome"]);
+         $tecnico->setEmail($row["email"]);
+         $tecnico->setTelefone($row["telefone"]);
       }
       return $tecnico;
    }

@@ -14,16 +14,17 @@ class ChamadoDAO extends DAO {
       $chamados = array();
       if($resultadoDB->rowCount() > 0) {
          while(($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
-            extract($row);
-            $novoChamado = new Chamado($id);
-            $novoChamado->setDescricao($descricao);
-            $novoChamado->setData($data);
-            $novoChamado->setTombo($tombo);
+            $novoChamado = new Chamado($row["id"]);
+            $novoChamado->setDescricao($row["descricao"]);
+            $novoChamado->setData($row["data"]);
+            $novoChamado->setTombo($row["tombo"]);
             $alteracaoDAO = new AlteracaoDAO();
             $alteracaoDAO->readByChamado($novoChamado);
             $novoChamado->setAlteracoes($alteracaoDAO->readByChamado($novoChamado));
-            $setor = new Setor($id_setor);
-            $tecnico = new Tecnico($id_tecnico);
+            $setor = new Setor();
+            $setor->setID($row["id_setor"]);
+            $tecnico = new Tecnico();
+            $tecnico->setLogin($row["id_tecnico"]);
             $novoChamado->setSetor($setor->read());
             $novoChamado->setTecnico($tecnico->read());
             array_push($chamados, $novoChamado);

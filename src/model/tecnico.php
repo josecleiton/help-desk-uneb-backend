@@ -8,10 +8,6 @@ class Tecnico extends Usuario {
     protected $chamados;
     protected $authKey;
 
-    function __construct($login) {
-       $this->login = $login;
-    }
-
     public function getLogin() {
        return $this->login;
     }
@@ -55,6 +51,9 @@ class Tecnico extends Usuario {
       );
     }
 
+    public function setLogin($login) {
+       $this->login = $login;
+    }
     public function setSetor($setor) {
        $this->setor = $setor;
     }

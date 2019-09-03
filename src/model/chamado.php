@@ -11,7 +11,7 @@ class Chamado {
     protected $setor;
     protected $tecnico;
 
-    function __construct($id) {
+    function __construct($id = 0) {
        $this->id = $id;
     }
 
@@ -72,7 +72,7 @@ class Chamado {
             "chamados" => true,
             "setor" => true,
          )),
-         "tombo" => $this->getTombo(),
+         "tombo" => array_key_exists("tombo", $nullVal) ? null : $this->getTombo(),
          "setor" => $this->getSetor()->getJSON(),
       );
     }
