@@ -65,16 +65,13 @@ CREATE TABLE `tchamado` (
   `data` date NOT NULL,
   `ti` tinyint(1) NOT NULL,
   `tombo` varchar(20) NOT NULL,
-  `id_observacao` int(11) DEFAULT NULL,
-  `id_tecnico` varchar(20) NOT NULL,
+  `id_tecnico` varchar(20) DEFAULT NULL,
   `id_usuario` varchar(11) NOT NULL,
   `id_setor` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `tchamado_tobservacao_id_fk` (`id_observacao`),
   KEY `tchamado_tsetor_id_fk` (`id_setor`),
   KEY `tchamado_ttecnico_login_fk` (`id_tecnico`),
   KEY `tchamado_tusuario_cpf_fk` (`id_usuario`),
-  CONSTRAINT `tchamado_tobservacao_id_fk` FOREIGN KEY (`id_observacao`) REFERENCES `tobservacao` (`id`),
   CONSTRAINT `tchamado_tsetor_id_fk` FOREIGN KEY (`id_setor`) REFERENCES `tsetor` (`id`),
   CONSTRAINT `tchamado_ttecnico_login_fk` FOREIGN KEY (`id_tecnico`) REFERENCES `ttecnico` (`login`),
   CONSTRAINT `tchamado_tusuario_cpf_fk` FOREIGN KEY (`id_usuario`) REFERENCES `tusuario` (`cpf`)
@@ -87,7 +84,7 @@ CREATE TABLE `tchamado` (
 
 LOCK TABLES `tchamado` WRITE;
 /*!40000 ALTER TABLE `tchamado` DISABLE KEYS */;
-INSERT INTO `tchamado` VALUES (2,'um chamado de teste','2019-08-16',1,'111111',NULL,'test','12345678901',1),(3,'test2','2019-08-20',1,'111111',NULL,'test','99999999999',1);
+INSERT INTO `tchamado` VALUES (2,'um chamado de teste','2019-08-16',1,'111111','test','12345678901',1),(3,'test2','2019-08-20',1,'111111','test','99999999999',1);
 /*!40000 ALTER TABLE `tchamado` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -101,7 +98,8 @@ DROP TABLE IF EXISTS `tcor`;
 CREATE TABLE `tcor` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `hex` varchar(6) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tcor_hex_uindex` (`hex`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -116,32 +114,6 @@ INSERT INTO `tcor` VALUES (1,'ffffff');
 UNLOCK TABLES;
 
 --
--- Table structure for table `tobservacao`
---
-
-DROP TABLE IF EXISTS `tobservacao`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tobservacao` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `descricao` text NOT NULL,
-  `id_tecnico` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `tobservacao_ttecnico_login_fk` (`id_tecnico`),
-  CONSTRAINT `tobservacao_ttecnico_login_fk` FOREIGN KEY (`id_tecnico`) REFERENCES `ttecnico` (`login`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tobservacao`
---
-
-LOCK TABLES `tobservacao` WRITE;
-/*!40000 ALTER TABLE `tobservacao` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tobservacao` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `tprioridade`
 --
 
@@ -151,7 +123,8 @@ DROP TABLE IF EXISTS `tprioridade`;
 CREATE TABLE `tprioridade` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `descricao` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tprioridade_descricao_uindex` (`descricao`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -203,8 +176,11 @@ CREATE TABLE `tsetor` (
   `nome` varchar(80) NOT NULL,
   `telefone` varchar(11) NOT NULL,
   `email` varchar(80) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tsetor_email_uindex` (`email`),
+  UNIQUE KEY `tsetor_nome_uindex` (`nome`),
+  UNIQUE KEY `tsetor_telefone_uindex` (`telefone`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -213,7 +189,7 @@ CREATE TABLE `tsetor` (
 
 LOCK TABLES `tsetor` WRITE;
 /*!40000 ALTER TABLE `tsetor` DISABLE KEYS */;
-INSERT INTO `tsetor` VALUES (1,'test','71999999999','test1@test.com');
+INSERT INTO `tsetor` VALUES (1,'test','71999999999','test1@test.com'),(20,'TI','373737','ti@uneb.br');
 /*!40000 ALTER TABLE `tsetor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -256,10 +232,10 @@ CREATE TABLE `ttecnico` (
   `nome` varchar(80) NOT NULL,
   `email` varchar(80) NOT NULL,
   `telefone` varchar(11) DEFAULT NULL,
-  `auth_key` varchar(250) DEFAULT NULL,
   `id_setor` int(11) NOT NULL,
   `cargo` char(1) DEFAULT NULL,
   PRIMARY KEY (`login`),
+  UNIQUE KEY `ttecnico_email_uindex` (`email`),
   KEY `ttecnico_tsetor_id_fk` (`id_setor`),
   CONSTRAINT `ttecnico_tsetor_id_fk` FOREIGN KEY (`id_setor`) REFERENCES `tsetor` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -271,7 +247,7 @@ CREATE TABLE `ttecnico` (
 
 LOCK TABLES `ttecnico` WRITE;
 /*!40000 ALTER TABLE `ttecnico` DISABLE KEYS */;
-INSERT INTO `ttecnico` VALUES ('test','Testando','test@test.com','71999999999',NULL,1,NULL);
+INSERT INTO `ttecnico` VALUES ('test','Testando','test@test.com','71999999999',1,NULL);
 /*!40000 ALTER TABLE `ttecnico` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -310,4 +286,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-21 19:32:22
+-- Dump completed on 2019-09-03 11:16:31

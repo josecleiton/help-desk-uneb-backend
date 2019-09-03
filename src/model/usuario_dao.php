@@ -8,6 +8,16 @@ class UsuarioDAO extends DAO {
    public function create($usuario) {
    }
 
+   public function existe($usuario) {
+      $query = "SELECT * FROM :tabela WHERE email = :email OR cpf = :cpf";
+      $resultadoDB = $this->conn->prepare($query);
+      $resultadoDB->bindValue(":tabela", self::TABLE);
+      $resultadoDB->bindValue(":email", $usuario->getEmail());
+      $resultadoDB->bindValue(":cpf", $usuario->getCPF());
+      $resultadoDB->execute();
+      return $resultadoDB->rowCount() == 1;
+   }
+
    public function read($usuario) {
 
       $cpfUsuario = $usuario->getCPF();
