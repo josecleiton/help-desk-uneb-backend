@@ -36,7 +36,7 @@ class Tecnico extends Usuario {
        return $this->authKey;
     }
 
-    public function getJSON($nullVal) {
+    public function getJSON($nullVal = array()) {
    //  protected $login;
    //  protected $setor;
    //  protected $chamados;
@@ -66,9 +66,9 @@ class Tecnico extends Usuario {
        $this->chamados = $chamados;
     }
 
-    public function read() {
+    public function read($spread = array()) {
        $dao = new TecnicoDAO();
-       return $dao->read($this);
+       return $dao->read($this, $spread);
     }
 
     public function atendeChamado($chamado) {

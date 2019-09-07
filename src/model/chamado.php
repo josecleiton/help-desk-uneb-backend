@@ -54,20 +54,24 @@ class Chamado {
     }
 
     protected function getAlteracoesJSON() {
+       if(!$this->alteracoes) return;
        return array_map(function ($alteracao){
           return $alteracao->getJSON();
-       }, $this->getAlteracoes());
+       }, $this->alteracoes);
     }
 
-    public function getJSON($nullVal) {
+    public function getJSON($nullVal = array()) {
       $usuario = $this->getUsuario();
       $tecnico = $this->getTecnico();
+      // var_dump($usuario);
       return array(
          "id" => $this->getID(),
          "descricao" => $this->getDescricao(),
          "data" => $this->getData(),
          "alteracoes" => $this->getAlteracoesJSON(),
-         "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(),
+         "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(array(
+            "chamados" => true
+         )),
          "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico->getJSON(array(
             "chamados" => true,
             "setor" => true,
@@ -75,6 +79,10 @@ class Chamado {
          "tombo" => array_key_exists("tombo", $nullVal) ? null : $this->getTombo(),
          "setor" => $this->getSetor()->getJSON(),
       );
+    }
+
+    public function setID($id) {
+       $this->id = $id;
     }
 
     public function setDescricao($descricao) {
@@ -103,6 +111,24 @@ class Chamado {
 
     public function setAlteracoes($alteracoes) {
        $this->alteracoes = $alteracoes;
+    }
+
+    public function delete() {
+       $dao = new ChamadoDAO();
+       return $dao->delete($this);
+    }
+    public function create() {
+       $dao = new ChamadoDAO();
+       return $dao->create($this);
+    }
+    public function readEmAberto() {
+       $dao = new ChamadoDAO();
+       return $dao->readEmAberto();
+    }
+
+    public function read($populate) {
+       $dao = new ChamadoDAO();
+       return $dao->readByID($this, $populate);
     }
 }
 

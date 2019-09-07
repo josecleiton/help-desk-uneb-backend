@@ -72,7 +72,7 @@ class Setor {
 
    public function read() {
       $dao = new SetorDAO();
-      return $dao->readByID($this);
+      return ($this->id) ? $dao->readByID($this) : $dao->readByNome($this);
    }
 
    public function readAll() {

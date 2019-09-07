@@ -3,22 +3,19 @@
 require_once("dao.php");
 
 class SituacaoDAO extends DAO {
-   const TABLE = "tsituacao";
+   private $table = "tsituacao";
    public function read($situacao) {
-      $query = "SELECT s.nome, c.hex " .
-               "FROM " . self::TABLE . " s, tcor c " .
-               "WHERE s.id = " . $situacao->getID() . " AND s.id_cor = c.id";
-
-      $resultadoDB = $this->conn->prepare($query);
+      $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id");
+      $resultadoDB->bindValue(":id", $situacao->getID(), PDO::PARAM_INT);
       $resultadoDB->execute();
       // echo "TEEEEEEST";
       if($resultadoDB->rowCount() == 1) {
          $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
-         extract($row);
-         $situacao->setNome($nome);
-         $situacao->setCor("#" . $hex);
+         $situacao->setNome($row["nome"]);
+         $situacao->setCor("#" . $row["cor"]);
+         return $situacao;
       }
-      return $situacao;
+      return false;
    }
 }
 

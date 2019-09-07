@@ -37,6 +37,7 @@ class Usuario {
     }
 
     public function getChamadosJSON() {
+       if(!$this->chamados) return null;
        return array_map(function ($chamado) {
           return $chamado->getJSON(array(
              "usuario" => true
@@ -64,23 +65,29 @@ class Usuario {
        $this->chamados = $chamados;
     }
 
-    public function read() {
+    public function read($spread = array()) {
        $dao = new UsuarioDAO();
-       return $dao->read($this);
+       return $dao->read($this, $spread);
     }
 
-    public function getJSON() {
+    public function getJSON($nullVal = array()) {
       return array(
+         "nome" => $this->getNome(),
          "cpf" => $this->getCPF(),
          "email" => $this->getEmail(),
          "telefone" => $this->getTelefone(),
-         "chamados" => $this->getChamadosJSON(),
+         "chamados" => array_key_exists("chamados", $nullVal) ? null : $this->getChamadosJSON(),
       );
     }
 
     public function existe() {
        $dao = new UsuarioDAO();
        return $dao->existe($this);
+    }
+
+    public function create() {
+       $dao = new UsuarioDAO();
+       return $dao->create($this);
     }
 
 
