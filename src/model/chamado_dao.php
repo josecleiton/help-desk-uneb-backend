@@ -128,7 +128,33 @@ class ChamadoDAO extends DAO {
    }
 
    public function create($chamado) {
-
+      $query = "INSERT INTO $this->table (descricao, data, ti, tombo, id_usuario, id_setor)
+                VALUES (:descricao, :data, :ti, :tombo, :idusuario, :idsetor)";
+      $resultadoDB = $this->conn->prepare($query);
+      $resultadoDB->bindValue(":descricao", $chamado->getDescricao(), PDO::PARAM_STR);
+      $data = Date("Y-m-d H:i:00");
+      $resultadoDB->bindParam(":data", $data, PDO::PARAM_STR);
+      $resultadoDB->bindValue(":ti", 0, PDO::PARAM_BOOL);
+      $resultadoDB->bindValue(":tombo", $chamado->getTombo(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":idusuario", $chamado->getUsuario()->getCPF(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":idsetor", $chamado->getSetor()->getID(), PDO::PARAM_INT);
+      $resultadoDB->execute();
+      if($resultadoDB->rowCount()) {
+         $chamado->setID($this->conn->lastInsertId());
+         $alteracao = new Alteracao();
+         $alteracao->setChamado($chamado);
+         $alteracao->setDescricao("Criação do chamado.");
+         $alteracao->setData($data);
+         $situacao = new Situacao(1);
+         $alteracao->setSituacao($situacao->read());
+         $prioridade = new Prioridade(1);
+         $alteracao->setPrioridade($prioridade->read());
+         if($alteracao->create()) {
+            $chamado->setAlteracoes(array($alteracao));
+            return true;
+         }
+      }
+      return false;
    }
 }
 

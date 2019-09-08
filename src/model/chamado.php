@@ -63,7 +63,6 @@ class Chamado {
     public function getJSON($nullVal = array()) {
       $usuario = $this->getUsuario();
       $tecnico = $this->getTecnico();
-      // var_dump($usuario);
       return array(
          "id" => $this->getID(),
          "descricao" => $this->getDescricao(),

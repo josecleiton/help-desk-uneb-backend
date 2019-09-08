@@ -29,6 +29,23 @@ class AlteracaoDAO extends DAO {
       return $alteracoes;
 
    }
+
+   public function create($alteracao) {
+      $query = "INSERT INTO $this->table (data, descricao, id_chamado, id_situacao, id_prioridade)
+                VALUES (:data, :descricao, :idchamado, :idsituacao, :idprioridade)";
+      $resultadoDB = $this->conn->prepare($query);
+      $resultadoDB->bindValue(":data", $alteracao->getData(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":descricao", $alteracao->getDescricao(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);
+      $resultadoDB->bindValue(":idsituacao", $alteracao->getSituacao()->getID(), PDO::PARAM_INT);
+      $resultadoDB->bindValue(":idprioridade", $alteracao->getPrioridade()->getID(), PDO::PARAM_INT);
+      $resultadoDB->execute();
+      if($resultadoDB->rowCount()) {
+         $alteracao->setID($this->conn->lastInsertId());
+         return true;
+      }
+      return false;
+   }
 }
 
 ?>

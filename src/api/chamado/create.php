@@ -37,15 +37,24 @@ if(!$usuario->existe()) {
   }
 }
 
-http_response_code(201);
 $setor = new Setor();
 $setor->setNome($data->setor_nome);
-if($setor_nome !== "TI") {
+if($data->setor_nome !== "TI") {
   $chamado = new Chamado();
   $chamado->setDescricao($data->descricao);
   $chamado->setUsuario($usuario);
   $chamado->setSetor($setor->read());
-  $chamado->create();
+  if($chamado->create()) {
+    http_response_code(201);
+    echo json_encode($chamado->getJSON(array(
+      "tecnico" => true
+    )));
+  } else {
+    echo json_encode(array(
+      "error" => 409,
+      "mensagem" => "Algum erro aconteceu ao criar o chamado."
+    ));
+  }
 }
 
 // se usuário não existir: crie

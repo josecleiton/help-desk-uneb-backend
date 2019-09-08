@@ -4,22 +4,24 @@ require_once("chamado_dao.php");
 
 class UsuarioDAO extends DAO {
 
+   private $table = "tusuario";
    public function create($usuario) {
-      $query = "INSERT INTO tusuario (cpf, nome, email, telefone) VALUES (:cpf, :nome, :email, :telefone)";
+      $query = "INSERT INTO $this->table (cpf, nome, email, telefone) VALUES (:cpf, :nome, :email, :telefone)";
       $resultadoDB = $this->conn->prepare($query);
-      $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR, 11);
-      $resultadoDB->bindValue(":nome", $usuario->getNome(), PDO::PARAM_STR, 80);
-      $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR, 80);
-      $resultadoDB->bindValue(":telefone", $usuario->getTelefone(), PDO::PARAM_STR, 11);
+      // var_dump($usuario);
+      $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":nome", $usuario->getNome(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":telefone", $usuario->getTelefone(), PDO::PARAM_STR);
       $resultadoDB->execute();
       return $resultadoDB->rowCount() == 1;
    }
 
    public function existe($usuario) {
-      $query = "SELECT * FROM tusuario WHERE email = :email OR cpf = :cpf";
+      $query = "SELECT * FROM $this->table WHERE email = :email AND cpf = :cpf";
       $resultadoDB = $this->conn->prepare($query);
-      $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR, 80);
-      $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR, 11);
+      $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
       // var_dump($resultadoDB->debugDumpParams());
       $resultadoDB->execute();
       return $resultadoDB->rowCount() == 1;
@@ -33,13 +35,13 @@ class UsuarioDAO extends DAO {
       //                      ("email = '" . $usuario->getEmail() . "'"));
       $resultadoDB = null;
       if($cpfUsuario) {
-         $query = "SELECT * FROM tusuario WHERE cpf = :cpf";
+         $query = "SELECT * FROM $this->table WHERE cpf = :cpf";
          $resultadoDB = $this->conn->prepare($query);
-         $resultadoDB->bindParam(":cpf",  $cpfUsuario, PDO::PARAM_STR, 11);
+         $resultadoDB->bindParam(":cpf",  $cpfUsuario, PDO::PARAM_STR);
       } else {
-         $query = "SELECT * FROM tusuario WHERE email = :email";
+         $query = "SELECT * FROM $this->table WHERE email = :email";
          $resultadoDB = $this->conn->prepare($query);
-         $resultadoDB->bindValue(":email",  $usuario->getEmail(), PDO::PARAM_STR, 11);
+         $resultadoDB->bindValue(":email",  $usuario->getEmail(), PDO::PARAM_STR);
       }
       // $resultadoDB->debugDumpParams();
       $resultadoDB->execute();

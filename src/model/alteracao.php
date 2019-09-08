@@ -7,8 +7,9 @@ class Alteracao {
    private $data;
    private $situacao;
    private $prioridade;
+   private $chamado;
 
-   function __construct($id) {
+   function __construct($id = 0) {
       $this->id = $id;
 
    }
@@ -43,8 +44,20 @@ class Alteracao {
       return $this->situacao;
    }
 
+   public function getChamado() {
+      return $this->chamado;
+   }
+
+   public function setID($id) {
+      $this->id = $id;
+   }
+
    public function setDescricao($descricao) {
       $this->descricao = $descricao;
+   }
+
+   public function setChamado($chamado) {
+      $this->chamado = $chamado;
    }
 
    public function setData($data) {
@@ -57,6 +70,11 @@ class Alteracao {
 
    public function setPrioridade($prioridade) {
       $this->prioridade = $prioridade;
+   }
+
+   public function create() {
+      $dao = new AlteracaoDAO();
+      return $dao->create($this);
    }
 
 }

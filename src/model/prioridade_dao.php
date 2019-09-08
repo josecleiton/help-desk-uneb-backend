@@ -2,7 +2,6 @@
 require_once("dao.php");
 class PrioridadeDAO extends DAO {
    private $table = "tprioridade";
-   const TABLE = "tprioridade";
    function read($prioridade) {
       $query = "SELECT descricao FROM $this->table WHERE id = :id";
 

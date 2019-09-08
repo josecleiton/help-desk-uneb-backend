@@ -9,7 +9,12 @@ class SetorDAO extends DAO {
       $resultadoDB->execute();
       if($resultadoDB->rowCount() == 1) {
          $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
-         $setor->setNome($row["nome"]);
+         if(array_key_exists("nome", $row)) {
+            $setor->setNome($row["nome"]);
+         }
+         if(array_key_exists("id", $row)) {
+            $setor->setID($row["id"]);
+         }
          $setor->setTelefone($row["telefone"]);
          $setor->setEmail($row["email"]);
       }
@@ -20,9 +25,9 @@ class SetorDAO extends DAO {
 
       $query = "INSERT INTO $this->table (nome, telefone, email) values (:nome, :telefone, :email)";
       $resultadoDB = $this->conn->prepare($query);
-      $resultadoDB->bindValue("nome", $setor->getNome(), PDO::PARAM_STR, 80);
-      $resultadoDB->bindValue("email", $setor->getEmail(), PDO::PARAM_STR, 80);
-      $resultadoDB->bindValue("telefone", $setor->getTelefone(), PDO::PARAM_STR, 11);
+      $resultadoDB->bindValue("nome", $setor->getNome(), PDO::PARAM_STR);
+      $resultadoDB->bindValue("email", $setor->getEmail(), PDO::PARAM_STR);
+      $resultadoDB->bindValue("telefone", $setor->getTelefone(), PDO::PARAM_STR);
       if($resultadoDB->execute()) {
          $setor->setID($this->conn->lastInsertId());
          return $resultadoDB->rowCount();
@@ -39,8 +44,8 @@ class SetorDAO extends DAO {
    }
 
    public function readByNome($setor) {
-      $resultadoDB = $this->conn->prepare("SELECT nome, telefone, email FROM $this->table WHERE nome = :nome");
-      $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR, 80);
+      $resultadoDB = $this->conn->prepare("SELECT id,telefone, email FROM $this->table WHERE nome = :nome");
+      $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
       return $this->readOne($setor, $resultadoDB);
    }
 
