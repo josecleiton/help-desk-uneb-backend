@@ -11,7 +11,7 @@ require_once(dirname(__FILE__) .  '/../../model/setor.php');
 $data = json_decode(file_get_contents("php://input"));
 
 $setor = new Setor();
-if (!$data->nome) {
+if (empty($data->nome)) {
   echo json_encode(array_map(function ($setor) {
     return $setor->getJSON();
   }, $setor->readAll()));

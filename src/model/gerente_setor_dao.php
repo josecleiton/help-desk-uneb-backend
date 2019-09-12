@@ -1,6 +1,6 @@
 <?php
 
-require_once 'tecnico_dao.php';
+require_once 'tecnico.php';
 
 class GerenteSetorDAO extends TecnicoDAO
 {

@@ -6,6 +6,7 @@ class UsuarioDAO extends DAO {
 
    private $table = "tusuario";
    public function create($usuario) {
+
       $query = "INSERT INTO $this->table (cpf, nome, email, telefone) VALUES (:cpf, :nome, :email, :telefone)";
       $resultadoDB = $this->conn->prepare($query);
       // var_dump($usuario);
@@ -69,5 +70,3 @@ class UsuarioDAO extends DAO {
    // public function delete($usuario) {
    // }
 }
-
-?>

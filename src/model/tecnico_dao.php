@@ -71,4 +71,45 @@ class TecnicoDAO extends DAO
         $tecnico->setSenha($hashedSenha);
         return $resultadoDB->execute();
     }
+
+    public function readAllBySetor()
+    {
+        if ($this->setor) {
+            $query = "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
+                             tecnico.id_setor, tecnico.cargo
+                      FROM ttecnico tecnico
+                      INNER JOIN tsetor setor
+                        ON tecnico.id_setor = setor.id
+                      WHERE setor.id = :setor
+            ";
+            $resultadoDB = $this->conn->prepare($query);
+            $resultadoDB->bindValue(":setor", $this->setor->getID(), PDO::PARAM_INT);
+        } else {
+            $query = "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
+                             tecnico.id_setor, tecnico.cargo
+                      FROM ttecnico tecnico
+            ";
+            $resultadoDB = $this->conn->prepare($query);
+        }
+        $resultadoDB->execute();
+        if ($resultadoDB->rowCount() > 0) {
+            $tecnicos = array();
+            while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
+                $novoTecnico = new Tecnico();
+                $novoTecnico->setLogin($row["login"]);
+                $novoTecnico->setNome($row["nome"]);
+                $novoTecnico->setEmail($row["email"]);
+                $novoTecnico->setTelefone($row["telefone"]);
+                if ($row["id_setor"]) {
+                    $setor = new Setor();
+                    $setor->setID($row["id_setor"]);
+                    $novoTecnico->setSetor($setor->read());
+                }
+                $novoTecnico->setCargo($row["cargo"]);
+                array_push($tecnicos, $novoTecnico);
+            }
+            return $tecnicos;
+        }
+        return false;
+    }
 }
