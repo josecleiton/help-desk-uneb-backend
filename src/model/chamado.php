@@ -120,9 +120,9 @@ class Chamado {
        $dao = new ChamadoDAO();
        return $dao->create($this);
     }
-    public function readEmAberto() {
+    public function readEmAberto($setor) {
        $dao = new ChamadoDAO();
-       return $dao->readEmAberto();
+       return $dao->readEmAberto($setor);
     }
 
     public function read($populate) {

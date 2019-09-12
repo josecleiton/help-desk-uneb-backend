@@ -6,24 +6,28 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once(dirname(__FILE__).  '/../../model/chamado.php');
+require_once(dirname(__FILE__).  '/../../model/tecnico.php');
+require_once(dirname(__FILE__).  '/../../model/setor.php');
+require_once(dirname(__FILE__) . '/../../model/request.php');
 
-// $data = json_decode(file_get_contents("php://input"));
-
-// AUTENTICA
+$tecnico = new Tecnico();
+if (!Tecnico::readJWTAndSet(Request::getAuthToken(), $tecnico)) {
+    echo json_encode(array(
+        "error" => 400,
+        "mensagem" => "Você não está autenticado",
+    ));
+    return false;
+}
 
 $chamado = new Chamado();
-// var_dump($chamado->readEmAberto());
-// $chamados = $chamado->readEmAberto();
-// $chamados_copy = array_map(function($chamado){
-//   return $chamado;
-// }, $chamados)
-
-// var_dump($chamados);
-echo json_encode(array_map(function($chamado){
-  return $chamado->getJSON();
-}, $chamado->readEmAberto()));
-// echo json_encode(array_map(function($chamado){
-//   return $chamado->getJSON();
-// }, $chamado->readEmAberto()));
+$setor = $tecnico->getSetor();
+// var_dump($tecnico);
+// var_dump($setor);
+// return;
+// var_dump ($chamado->readEmAberto($setor));
+// return;
+  echo json_encode(array_map(function($chamado){
+    return $chamado->getJSON();
+  }, $chamado->readEmAberto($setor)));
 
 ?>

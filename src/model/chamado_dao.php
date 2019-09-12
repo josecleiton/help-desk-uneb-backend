@@ -10,8 +10,7 @@ require_once("setor.php");
 class ChamadoDAO extends DAO {
    private $table = "tchamado";
 
-   protected function read($query, $populate = array()) {
-      $resultadoDB = $this->conn->prepare($query);
+   protected function read($resultadoDB, $populate = array()) {
       $resultadoDB->execute();
       $chamados = array();
       if($resultadoDB->rowCount() > 0) {
@@ -45,14 +44,16 @@ class ChamadoDAO extends DAO {
    }
 
    public function readByUsuario($usuario) {
-      $query = "SELECT * FROM $this->table WHERE id_usuario = " . $usuario->getCPF();
-      return $this->read($query, array("tecnico" => true, "usuario" => false));
+      $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id_usuario = :usuario");
+      $resultadoDB->bindValue(":usuario", $usuario->getCPF(), PDO::PARAM_STR);
+      return $this->read($resultadoDB, array("tecnico" => true, "usuario" => false));
       // QUERY INCOMPLETA
    }
 
    public function readByTecnico($tecnico) {
-      $query = "SELECT * FROM $this->table WHERE id_tecnico = '" . $tecnico->getLogin() . "'";
-      return $this->read($query, array("tecnico" => false, "usuario" => true));
+      $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id_tecnico = :tecnico");
+      $resultadoDB->bindValue(":usuario", $tecnico->getLogin(), PDO::PARAM_STR);
+      return $this->read($resultadoDB, array("tecnico" => false, "usuario" => true));
    }
 
    public function readByID($chamado, $populate = array()) {
@@ -87,16 +88,39 @@ class ChamadoDAO extends DAO {
       return false;
    }
 
-   public function readEmAberto() {
-      $query = "SELECT chamado.id, chamado.descricao, chamado.data, chamado.ti, 
+   public function readEmAberto($setor) {
+      if($setor) {
+         $query = "SELECT chamado.id, chamado.descricao, chamado.data, chamado.ti, 
                         chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
-                        chamado.id_setor
+                     chamado.id_setor
                FROM tchamado chamado
-               LEFT JOIN talteracao alteracao
-                  ON (chamado.id = alteracao.id_chamado)
-               WHERE alteracao.id_chamado IS NULL";
-      $resultadoDB = $this->conn->prepare($query);
+               INNER JOIN talteracao alteracao
+                  ON chamado.id = alteracao.id_chamado
+               GROUP BY chamado.id, chamado.descricao, chamado.data, chamado.ti, 
+                     chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
+                     chamado.id_setor 
+               HAVING count(*) = 1 AND id_setor = :setor
+         ";
+         $resultadoDB = $this->conn->prepare($query);
+         $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+         // var_dump($setor);
+         // $resultadoDB->debugDumpParams();
+      } else {
+         $query = "SELECT chamado.id, chamado.descricao, chamado.data, chamado.ti, 
+                        chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
+                     chamado.id_setor
+               FROM tchamado chamado
+               INNER JOIN talteracao alteracao
+                  ON chamado.id = alteracao.id_chamado
+               GROUP BY chamado.id, chamado.descricao, chamado.data, chamado.ti, 
+                     chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
+                     chamado.id_setor 
+               HAVING count(*) = 1
+         ";
+         $resultadoDB = $this->conn->prepare($query);
+      }
       $resultadoDB->execute();
+      
       $chamados = array();
       while($row = $resultadoDB->fetch(PDO::FETCH_ASSOC)) {
          $chamado = new Chamado();
@@ -115,7 +139,6 @@ class ChamadoDAO extends DAO {
          $chamado->setUsuario($usuario->read(array("chamados" => false)));
          array_push($chamados, $chamado);
       }
-      // var_dump($chamados);
       return $chamados;
    }
 

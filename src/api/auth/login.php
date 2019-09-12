@@ -23,8 +23,12 @@ $tecnico = new Tecnico();
 $tecnico->setLogin($data->usuario);
 $tecnico->setSenha($data->senha);
 if($tecnico->auth()) {
+  $jwtObject = $tecnico->toJWT();
+  $jwtObject[0]["senha"] = null;
   echo json_encode(array(
-    "token" => $tecnico->toJWT(),
+    "usuario" => $jwtObject[0],
+    "token" => $jwtObject[1],
+    "expira" => $jwtObject[0]["logado_em"] + 86400*7,
     "mensagem" => "Você está autenticado!",
   ));
 } else {

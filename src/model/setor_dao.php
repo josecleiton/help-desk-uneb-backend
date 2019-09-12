@@ -49,13 +49,31 @@ class SetorDAO extends DAO {
       return $this->readOne($setor, $resultadoDB);
    }
 
-   public function readByTecnico($tecnico) {
+   public function readByTecnico($setor, $tecnico) {
       // $query = "SELECT nome, telefone, email FROM " . self::TABLE .
       //          " WHERE id_tecnico = " . $tecnico->getID();
-      $query = "SELECT nome, telefone, email FROM $this->table WHERE id_tecnico = :idtecnico";
+      
+      $query = "SELECT setor.id, setor.nome, setor.telefone, setor.email 
+               FROM ttecnico tecnico 
+               INNER JOIN tsetor setor
+                  ON tecnico.id_setor = setor.id
+               WHERE tecnico.login = :tecnico
+      ";
       $resultadoDB = $this->conn->prepare($query);
-      $resultadoDB->bindValue(":idtecnico", $tecnico->getID());
-      return $this->readOne(new Setor(), $query);
+      $resultadoDB->bindValue(":tecnico", $tecnico->getLogin());
+      // var_dump($tecnico);
+      // return null;
+      $resultadoDB->execute();
+      if($resultadoDB->rowCount()) {
+         $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+         $setor->setID($row["id"]);
+         $setor->setNome($row["nome"]);
+         $setor->setTelefone($row["telefone"]);
+         $setor->setEmail($row["email"]);
+         return $setor;
+      }
+      // var_dump($setor);
+      return null;
    }
 
    public function readAll() {

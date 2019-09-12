@@ -39,8 +39,7 @@ class AlteracaoDAO extends DAO {
       $resultadoDB->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);
       $resultadoDB->bindValue(":idsituacao", $alteracao->getSituacao()->getID(), PDO::PARAM_INT);
       $resultadoDB->bindValue(":idprioridade", $alteracao->getPrioridade()->getID(), PDO::PARAM_INT);
-      $resultadoDB->execute();
-      if($resultadoDB->rowCount()) {
+      if($resultadoDB->execute()) {
          $alteracao->setID($this->conn->lastInsertId());
          return true;
       }

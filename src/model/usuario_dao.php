@@ -13,8 +13,8 @@ class UsuarioDAO extends DAO {
       $resultadoDB->bindValue(":nome", $usuario->getNome(), PDO::PARAM_STR);
       $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
       $resultadoDB->bindValue(":telefone", $usuario->getTelefone(), PDO::PARAM_STR);
-      $resultadoDB->execute();
-      return $resultadoDB->rowCount() == 1;
+      return $resultadoDB->execute();
+      // return $resultadoDB->rowCount() == 1;
    }
 
    public function existe($usuario) {
@@ -63,11 +63,11 @@ class UsuarioDAO extends DAO {
       return false;
    }
 
-   public function update($usuario) {
-   }
+   // public function update($usuario) {
+   // }
 
-   public function remove($usuario) {
-   }
+   // public function delete($usuario) {
+   // }
 }
 
 ?>

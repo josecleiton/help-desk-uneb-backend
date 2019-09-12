@@ -6,13 +6,25 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require_once(dirname(__FILE__).  '/../../model/setor.php');
+require_once(dirname(__FILE__) .  '/../../model/setor.php');
 
-// autenticação aqui
+$data = json_decode(file_get_contents("php://input"));
 
-$setor= new Setor();
-echo json_encode(array_map(function($setor){
-  return $setor->getJSON();
-}, $setor->readAll()));
+$setor = new Setor();
+if (!$data->nome) {
+  echo json_encode(array_map(function ($setor) {
+    return $setor->getJSON();
+  }, $setor->readAll()));
+} else {
+  $setor->setNome($data->nome);
+  if ($setor->read()) {
+    echo json_encode($setor->getJSON());
+  } else {
+    echo json_encode(array(
+      "error" => 404,
+      "mensagem" => "Erro na busca por setor $data->nome."
+    ));
+  }
+}
 
 ?>

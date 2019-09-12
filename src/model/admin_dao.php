@@ -1,45 +1,22 @@
 <?php
-require_once("dao.php");
+require_once('tecnico_dao.php');
 require_once('admin.php');
 require_once('tecnico.php');
 
-class admin_dao extends DAO
+class AdminDAO extends TecnicoDAO
 {
-    //const TABLE = "talteracao";
-
-    public function insertAdmin($admin)
+    public function create($admin, $senha)
     {
-        $query = "INSERT INTO ttecnico (login,nome,email,telefone,id_setor, cargo)
-         VALUES (:login,:nome,:email,:telefone,:id_setor,'A')";
+        $query = "INSERT INTO $this->table (login,nome,email,telefone,senha,cargo)
+         VALUES (:login,:nome,:email,:telefone,:senha,'A')";
         $insertDB = $this->conn->prepare($query);
-        $insertDB->bindValue("login", $login);
-        $insertDB->bindValue("nome", $nome);
-        $insertDB->bindValue("email", $email);
-        $insertDB->bindValue("telefone", $telefone);
-        $insertDB->bindValue("id_setor", $idSetor);
-        $insertDB->bindValue("cargo", $cargo);
-        $login = $admin->getLogin();
-        $nome = $admin->getNome();
-        $email = $admin->getEmail();
-        $telefone = $admin->getTelefone();
-        $idSetor = $admin->getSetor();
-
-        if ($insertDB->execute()) {
-            $admin->setID($this->conn->lastInsertId());
-            return $insertDB->rowCount();
-        }
-        return 0;
-    }
-    public function deleteAdmin($admin)
-    {
-        $query = "DELETE FROM ttecnico WHERE [nome=$nome AND login=$login]";
-        $deleteDB = $this->conn->prepare($query);
-        $nome = $admin->getNome();
-        $login = $admin->getLogin();
-        if ($deleteDB->execute()) {
-            $admin->setID($this->conn->lastInsertId());
-            return $deleteDB->rowCount();
-        }
-        return 0;
+        $insertDB->bindValue(":login", $admin->getLogin(), PDO::PARAM_STR);
+        $insertDB->bindValue(":nome", $admin->getNome(), PDO::PARAM_STR);
+        $insertDB->bindValue(":email", $admin->getEmail(), PDO::PARAM_STR);
+        $insertDB->bindValue(":telefone", $admin->getTelefone(), PDO::PARAM_STR);
+        $hashedSenha = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
+        $insertDB->bindParam(":senha", $hashedSenha, PDO::PARAM_STR);
+        $admin->setSenha($hashedSenha);
+        return $insertDB->execute();
     }
 }

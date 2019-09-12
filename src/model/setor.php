@@ -3,6 +3,7 @@ require_once("problema_dao.php");
 require_once("setor_dao.php");
 
 class Setor {
+
    private $id;
    private $nome;
    private $tel;
@@ -73,6 +74,11 @@ class Setor {
    public function read() {
       $dao = new SetorDAO();
       return ($this->id) ? $dao->readByID($this) : $dao->readByNome($this);
+   }
+
+   public function readByTecnico($tecnico) {
+      $dao = new SetorDAO();
+      return $dao->readByTecnico($this, $tecnico);
    }
 
    public function readAll() {

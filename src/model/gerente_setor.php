@@ -1,35 +1,44 @@
 <?php
 
-require_once('tecnico.php');
+require_once "tecnico.php";
+require_once "gerente_setor_dao.php";
 
-class GerenteSetor extends Tecnico {
-    public function cadastraTipoChamado($problema) {
-
-    }
-
-    public function cadastraTecnico($tecnico) {
-
-    }
-
-    public function removeTecnico($tecnico) {
+class GerenteSetor extends Tecnico
+{
+    public function cadastraTipoProblema($problema)
+    {
 
     }
 
-    public function editaTecnico($tecnico, $novosDados) {
+    public function cadastraProblema($problema)
+    {
 
     }
 
-    public function cadastraProblema($problema) {
+    public function editaProblema($problema)
+    {
 
     }
 
-    public function editaProblema($problema) {
+    public function removeProblema($problema)
+    {
 
     }
 
-    public function removeProblema($problema) {
+    public function createTecnico($tecnico)
+    {
+        return $tecnico->create();
+    }
 
+    public function deleteTecnico($tecnico)
+    {
+        return $tecnico->delete();
+    }
+
+    public function create()
+    {
+        $dao = new GerenteSetorDAO();
+        return $dao->create($this, $this->senha);
     }
 
 }
-?>
