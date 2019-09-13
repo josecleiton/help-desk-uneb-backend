@@ -87,10 +87,10 @@ class Setor
     return $dao->create($this);
   }
 
-  public function read()
+  public function read($problema = true)
   {
     $dao = new SetorDAO();
-    return ($this->id) ? $dao->readByID($this) : $dao->readByNome($this);
+    return ($this->id) ? $dao->readByID($this, $problema) : $dao->readByNome($this, $problema);
   }
 
   public function readByTecnico($tecnico)

@@ -1,14 +1,15 @@
 <?php
 
-class Request {
-  static public function getAuthToken() {
+class Request
+{
+  static public function getAuthToken()
+  {
 
     $bearerToken = apache_request_headers()["Authorization"];
-    if(!$bearerToken) {
+    // var_dump($bearerToken);
+    if (!$bearerToken) {
       return false;
     }
     return substr($bearerToken, strlen("Bearer "));
   }
 }
-
-?>

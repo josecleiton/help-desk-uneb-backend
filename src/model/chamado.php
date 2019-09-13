@@ -1,134 +1,179 @@
 <?php
 require_once("chamado_dao.php");
 
-class Chamado {
-    protected $id;
-    protected $descricao;
-    protected $data;
-    protected $alteracoes;
-    protected $tombo;
-    protected $usuario;
-    protected $setor;
-    protected $tecnico;
+class Chamado
+{
+  protected $id;
+  protected $descricao;
+  protected $data;
+  protected $alteracoes;
+  protected $tombo;
+  protected $usuario;
+  protected $setor;
+  protected $tecnico;
+  protected $problema;
 
-    function __construct($id = 0) {
-       $this->id = $id;
-    }
+  function __construct($id = 0)
+  {
+    $this->id = $id;
+  }
 
-    public function getID() {
-       return $this->id;
-    }
+  public function getID()
+  {
+    return $this->id;
+  }
 
-    public function getSituacao($alteracao = -1) {
-       if($alteracao == -1)
-          $alteracao = count($this->alteracoes);
-       return $this->alteracoes[$alteracao];
-    }
+  public function getAlteracao($alteracaoIdx = -1)
+  {
+    if ($alteracaoIdx === -1)
+      $alteracaoIdx = count($this->alteracoes) - 1;
+    return $this->alteracoes[$alteracaoIdx];
+  }
 
-    public function getDescricao() {
-       return $this->descricao;
-    }
+  public function getSituacao()
+  {
+    return $this->getAlteracao()->getSituacao();
+  }
 
-    public function getData() {
-       return $this->data;
-    }
+  public function getDescricao()
+  {
+    return $this->descricao;
+  }
 
-    public function getTombo() {
-       return $this->tombo;
-    }
+  public function getData()
+  {
+    return $this->data;
+  }
 
-    public function getUsuario() {
-       return $this->usuario;
-    }
+  public function getTombo()
+  {
+    return $this->tombo;
+  }
 
-    public function getSetor() {
-       return $this->setor;
-    }
+  public function getUsuario()
+  {
+    return $this->usuario;
+  }
 
-    public function getTecnico() {
-       return $this->tecnico;
-    }
+  public function getSetor()
+  {
+    return $this->setor;
+  }
 
-    public function getAlteracoes() {
-       return $this->alteracoes;
-    }
+  public function getTecnico()
+  {
+    return $this->tecnico;
+  }
 
-    protected function getAlteracoesJSON() {
-       if(!$this->alteracoes) return;
-       return array_map(function ($alteracao){
-          return $alteracao->getJSON();
-       }, $this->alteracoes);
-    }
+  public function getAlteracoes()
+  {
+    return $this->alteracoes;
+  }
 
-    public function getJSON($nullVal = array()) {
-      $usuario = $this->getUsuario();
-      $tecnico = $this->getTecnico();
-      return array(
-         "id" => $this->getID(),
-         "descricao" => $this->getDescricao(),
-         "data" => $this->getData(),
-         "alteracoes" => $this->getAlteracoesJSON(),
-         "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(array(
-            "chamados" => true
-         )),
-         "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico->getJSON(array(
-            "chamados" => true,
-            "setor" => true,
-         )),
-         "tombo" => array_key_exists("tombo", $nullVal) ? null : $this->getTombo(),
-         "setor" => $this->getSetor()->getJSON(),
-      );
-    }
+  public function getProblema()
+  {
+    return $this->problema;
+  }
 
-    public function setID($id) {
-       $this->id = $id;
-    }
+  protected function getAlteracoesJSON()
+  {
+    if (!$this->alteracoes) return;
+    return array_map(function ($alteracao) {
+      return $alteracao->getJSON();
+    }, $this->alteracoes);
+  }
 
-    public function setDescricao($descricao) {
-       $this->descricao = $descricao;
-    }
+  public function getJSON($nullVal = array())
+  {
+    $usuario = $this->getUsuario();
+    $tecnico = $this->getTecnico();
+    return array(
+      "id" => $this->getID(),
+      "descricao" => $this->getDescricao(),
+      "data" => $this->getData(),
+      "alteracoes" => $this->getAlteracoesJSON(),
+      "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(array(
+        "chamados" => true
+      )),
+      "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico->getJSON(array(
+        "chamados" => true,
+        "setor" => true,
+      )),
+      "tombo" => array_key_exists("tombo", $nullVal) ? null : $this->getTombo(),
+      "setor" => array_key_exists("setor", $nullVal) ? null : $this->getSetor()->getJSON(),
+      "problema" => ($problema = $this->getProblema()) ? $problema->getJSON() : null,
+    );
+  }
 
-    public function setData($data) {
-       $this->data = $data;
-    }
+  public function setID($id)
+  {
+    $this->id = $id;
+  }
 
-    public function setTombo($tombo) {
-       $this->tombo = $tombo;
-    }
+  public function setDescricao($descricao)
+  {
+    $this->descricao = $descricao;
+  }
 
-    public function setUsuario($usuario) {
-       $this->usuario = $usuario;
-    }
+  public function setData($data)
+  {
+    $this->data = $data;
+  }
 
-    public function setSetor($setor) {
-       $this->setor = $setor;
-    }
+  public function setTombo($tombo)
+  {
+    $this->tombo = $tombo;
+  }
 
-    public function setTecnico($tecnico) {
-       $this->tecnico = $tecnico;
-    }
+  public function setUsuario($usuario)
+  {
+    $this->usuario = $usuario;
+  }
 
-    public function setAlteracoes($alteracoes) {
-       $this->alteracoes = $alteracoes;
-    }
+  public function setSetor($setor)
+  {
+    $this->setor = $setor;
+  }
 
-    public function delete() {
-       $dao = new ChamadoDAO();
-       return $dao->delete($this);
-    }
-    public function create() {
-       $dao = new ChamadoDAO();
-       return $dao->create($this);
-    }
-    public function readEmAberto($setor) {
-       $dao = new ChamadoDAO();
-       return $dao->readEmAberto($setor);
-    }
+  public function setTecnico($tecnico)
+  {
+    $this->tecnico = $tecnico;
+  }
 
-    public function read($populate) {
-       $dao = new ChamadoDAO();
-       return $dao->readByID($this, $populate);
-    }
+  public function setAlteracoes($alteracoes)
+  {
+    $this->alteracoes = $alteracoes;
+  }
+
+  public function setProblema($problema)
+  {
+    $this->problema = $problema;
+  }
+
+  public function delete()
+  {
+    $dao = new ChamadoDAO();
+    return $dao->delete($this);
+  }
+  public function create()
+  {
+    $dao = new ChamadoDAO();
+    return $dao->create($this);
+  }
+  public function readBySetor()
+  {
+    $dao = new ChamadoDAO();
+    return $dao->readBySetor($this);
+  }
+  public function readEmAberto($setor)
+  {
+    $dao = new ChamadoDAO();
+    return $dao->readEmAberto($setor);
+  }
+
+  public function read($populate)
+  {
+    $dao = new ChamadoDAO();
+    return $dao->readByID($this, $populate);
+  }
 }
-
-?>

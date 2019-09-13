@@ -7,7 +7,7 @@ class SetorDAO extends DAO
 {
   private $table = "tsetor";
 
-  protected function readOne($setor, $resultadoDB)
+  protected function readOne($setor, $resultadoDB, $populateProblema)
   {
     $resultadoDB->execute();
     if ($resultadoDB->rowCount() == 1) {
@@ -20,9 +20,11 @@ class SetorDAO extends DAO
       }
       $setor->setTelefone($row["telefone"]);
       $setor->setEmail($row["email"]);
-      $problema = new Problema();
-      $problema->setSetor($setor);
-      $setor->setProblemas($problema->readAllBySetor(array("setor" => true)));
+      if ($populateProblema) {
+        $problema = new Problema();
+        $problema->setSetor($setor);
+        $setor->setProblemas($problema->readAllBySetor(array("setor" => false)));
+      }
       return $setor;
     }
     return false;
@@ -43,20 +45,20 @@ class SetorDAO extends DAO
     return 0;
   }
 
-  public function readByID($setor)
+  public function readByID($setor, $problema)
   {
     // $query = "SELECT nome, telefone, email FROM " . self::TABLE .
     //          " WHERE id = " . $setor->getID();
     $resultadoDB = $this->conn->prepare("SELECT nome, telefone, email FROM $this->table WHERE id = :id");
     $resultadoDB->bindValue(":id", $setor->getID(), PDO::PARAM_INT);
-    return $this->readOne($setor, $resultadoDB);
+    return $this->readOne($setor, $resultadoDB, $problema);
   }
 
-  public function readByNome($setor)
+  public function readByNome($setor, $problema)
   {
     $resultadoDB = $this->conn->prepare("SELECT id,telefone, email FROM $this->table WHERE nome = :nome");
     $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
-    return $this->readOne($setor, $resultadoDB);
+    return $this->readOne($setor, $resultadoDB, $problema);
   }
 
   public function readByTecnico($setor, $tecnico)

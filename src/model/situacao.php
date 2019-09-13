@@ -2,46 +2,58 @@
 
 require_once("situacao_dao.php");
 
-class Situacao {
-   private $id;
-   private $nome;
-   private $cor;
+class Situacao
+{
+  private $id;
+  private $nome;
+  private $cor;
 
-   function __construct($id) {
-      $this->id = $id;
-   }
+  function __construct($id = 0)
+  {
+    $this->id = $id;
+  }
 
-   public function getID() {
-      return $this->id;
-   }
+  public function getID()
+  {
+    return $this->id;
+  }
 
-   public function getNome() {
-      return $this->nome;
-   }
+  public function getNome()
+  {
+    return $this->nome;
+  }
 
-   public function getCor() {
-      return $this->cor;
-   }
+  public function getCor()
+  {
+    return $this->cor;
+  }
 
-   public function getJSON() {
-      return array(
-         "nome" => $this->getNome(),
-         "cor" => $this->getCor(),
-      );
-   }
+  public function getJSON()
+  {
+    return array(
+      "nome" => $this->getNome(),
+      "cor" => $this->getCor(),
+    );
+  }
 
-   public function setNome($nome) {
-      $this->nome = $nome;
-   }
+  public function setNome($nome)
+  {
+    $this->nome = $nome;
+  }
 
-   public function setCor($cor) {
-      $this->cor = $cor;
-   }
+  public function setCor($cor)
+  {
+    $this->cor = $cor;
+  }
 
-   public function read() {
-      $dao = new SituacaoDAO();
-      return $dao->read($this);
-   }
+  public function read()
+  {
+    $dao = new SituacaoDAO();
+    return $dao->read($this);
+  }
+  public function readAll()
+  {
+    $dao = new SituacaoDAO();
+    return $dao->readAll();
+  }
 }
-
-?>

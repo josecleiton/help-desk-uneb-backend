@@ -55,9 +55,14 @@ class Problema
     $dao = new ProblemaDAO();
     return $dao->create($this);
   }
-  public function readAllBySetor($nullVal = array())
+  public function readAllBySetor($populate = array())
   {
     $dao = new ProblemaDAO();
-    return $dao->readAllBySetor($this, $nullVal);
+    return $dao->readAllBySetor($this, $populate);
+  }
+  public function read()
+  {
+    $dao = new ProblemaDAO();
+    return $dao->read($this);
   }
 }

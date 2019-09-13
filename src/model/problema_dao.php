@@ -1,6 +1,7 @@
 <?php
 
 require_once("dao.php");
+require_once("setor.php");
 
 class ProblemaDAO extends DAO
 {
@@ -17,7 +18,26 @@ class ProblemaDAO extends DAO
     return $resultadoDB->execute();
   }
 
-  public function readAllBySetor($problema, $nullVal)
+  public function read($problema)
+  {
+    $resultadoDB = $this->conn->prepare(
+      "SELECT * FROM $this->table
+       WHERE id = :id"
+    );
+    // var_dump($problema);
+    $resultadoDB->bindValue(":id", $problema->getID(), PDO::PARAM_INT);
+    $resultadoDB->execute();
+    if ($resultadoDB->rowCount()) {
+      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+      $problema->setDescricao($row["descricao"]);
+      $setor = new Setor();
+      $setor->setID($row["id_setor"]);
+      $problema->setSetor($setor->read(false));
+      return $problema;
+    }
+  }
+
+  public function readAllBySetor($problema, $populate)
   {
     // var_dump($nullVal);
     $setor = $problema->getSetor();
@@ -33,7 +53,7 @@ class ProblemaDAO extends DAO
         $novoProblema = new Problema();
         $novoProblema->setID($row["id"]);
         $novoProblema->setDescricao($row["descricao"]);
-        if (!array_key_exists("setor", $nullVal))
+        if ($populate["setor"])
           $novoProblema->setSetor($setor);
         array_push($problemas, $novoProblema);
       }
