@@ -55,6 +55,9 @@ if (!$situacaoAntes->read() || !$situacaoDepois->read()) {
 $chamado = new Chamado($data->id);
 if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
   // var_dump($chamado);
+  if (!empty($data->tombo)) {
+    $chamado->setTombo($data->tombo);
+  }
   if ($chamado->getAlteracao()->getSituacao()->getNome() !== $situacaoAntes->getNome()) {
     echo json_encode(array(
       "error" => 400,
@@ -104,30 +107,6 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
           "mensagem" => $e->getMessage()
         ));
       }
-      // if ($situacaoAntesNome === 'Transferido') {
-      //   if (empty($data->descricao)) {
-      //     $alteracao->setDescricao("Em atendimento por " . $tecnico->getNome());
-      //   }
-      //   try {
-      //     $tecnico->cadastraAlteracao($alteracao);
-      //     $chamado->setTecnico($tecnico);
-      //     $chamado->update();
-      //   } catch (\Exception $e) {
-      //     echo json_encode(array(
-      //       "error" => 500,
-      //       "mensagem" => $e->getMessage()
-      //     ));
-      //   }
-      // } else if($situacaoAntesNome === 'Em Atendimento') {
-      //   if($situacaoDepoisNome === 'Pendente') {
-      //     if(empty($data->descricao)) {
-      //       $alteracao->setDescricao("Chamado pendente por falta de recursos");
-      //     }
-      //   } else {
-
-      //   }
-
-      // if ($tecnico->mudaSituacao($chamado, $situacaoDepois)) { }
     } else {
       // var_dump($tecnico);
       if (empty($data->novo_setor) && empty($data->novo_tecnico)) {
@@ -135,73 +114,67 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
           "error" => 400,
           "mensagem" => "Novas informações devem ser fornecidas (novo setor ou novo técnico)."
         ));
-        // return false;
-      } else if (!empty($data->novo_setor)) {
-        $novoSetor = new Setor();
-        $novoSetor->setNome($data->novo_setor);
-        if ($setor && $novoSetor->getNome() === $setor->getNome()) {
+        return false;
+      } else {
+        if (empty($setor)) {
           echo json_encode(array(
             "error" => 400,
-            "mensagem" => "Transferência para o mesmo Setor não é permitida",
+            "mensagem" => "Setor tem que ser fornecido",
           ));
           return false;
         }
-        if (empty($data->descricao)) {
-          $alteracao->setDescricao("Do setor " . $setor->getNome() . " para " . $novoSetor->getNome());
-        }
-        // var_dump($alteracao);
-        if ($novoSetor->read(false)) {
-          // var_dump($novoSetor);
-          try {
-            $tecnico->cadastraAlteracao($alteracao);
-            $chamado->setSetor($novoSetor);
-            $chamado->setTecnico(null);
-            $chamado->update();
-          } catch (\Exception $e) {
+        if ($data->novo_setor !== $setor->getNome()) {
+          $novoSetor = new Setor();
+          $novoSetor->setNome($data->novo_setor);
+          if (!$novoSetor->read(false)) {
             echo json_encode(array(
-              "error" => 500,
-              "mensagem" => $e->getMessage()
+              "error" => 404,
+              "mensagem" => "Setor não encontrado",
             ));
+            return false;
           }
-        } else {
-          echo json_encode(array(
-            "error" => 404,
-            "mensagem" => "Setor não encontrado",
-          ));
+          $chamado->setSetor($novoSetor);
+          $alteracao->setDescricao("Transferência de " . $setor->getNome() . " para " . $novoSetor->getNome());
         }
-      } else {
-        $novoTecnico = new Tecnico();
-        $novoTecnico->setLogin($data->novo_tecnico);
-        // var_dump($alteracao);
-        if (
-          $tecnico->getLogin() === $novoTecnico->getLogin() &&
-          $situacaoDepois->getNome() === 'Transferido'
-        ) {
+        $chamado->setTecnico(null);
+        if (!empty($data->novo_tecnico)) {
+          $novoTecnico = new Tecnico();
+          $novoTecnico->setLogin($data->novo_tecnico);
+          if ($data->novo_tecnico === $tecnico->getLogin()) {
+            echo json_encode(array(
+              "error" => 409,
+              "mensagem" => "Deve-se transferir para um técnico diferente",
+            ));
+            return false;
+          }
+          if (!$novoTecnico->read()) {
+            echo json_encode(array(
+              "error" => 404,
+              "mensagem" => "Tecnico não encontrado",
+            ));
+            return false;
+          }
+          if ($novoTecnico->getSetor() && $novoTecnico->getSetor()->getNome() !== $novoSetor->getNome()) {
+            echo json_encode(array(
+              "error" => 404,
+              "mensagem" => "Tecnico e setor não batem",
+            ));
+            return false;
+          }
+          $chamado->setTecnico($novoTecnico);
+          if (!$alteracao->getDescricao()) {
+            $alteracao->setDescricao("Transferência de " . $tecnico->getNome() . " para " . $novoTecnico->getNome());
+          }
+        }
+        try {
+          $tecnico->cadastraAlteracao($alteracao);
+          $chamado->update();
+        } catch (\Exception $e) {
           echo json_encode(array(
-            "error" => 409,
-            "mensagem" => "Técnico tem que ser diferente",
+            "error" => 500,
+            "mensagem" => $e->getMessage()
           ));
           return false;
-        }
-        if ($tecnico->getLogin() === $novoTecnico->getLogin() || $novoTecnico->read()) {
-          if ($situacaoDepois->getNome() === 'Transferido' && empty($data->descricao)) {
-            $alteracao->setDescricao("Do técnico " . $tecnico->getNome() . " para " . $novoTecnico->getNome());
-          }
-          try {
-            $tecnico->cadastraAlteracao($alteracao);
-            $chamado->setTecnico($novoTecnico);
-            $chamado->update();
-          } catch (\Exception $e) {
-            echo json_encode(array(
-              "error" => 500,
-              "mensagem" => $e->getMessage()
-            ));
-          }
-        } else {
-          echo json_encode(array(
-            "error" => 404,
-            "mensagem" => "Técnico não encontrado",
-          ));
         }
       }
     }

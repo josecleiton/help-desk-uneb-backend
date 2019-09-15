@@ -9,24 +9,48 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 require_once dirname(__FILE__) . '/../../model/gerente_setor.php';
 require_once dirname(__FILE__) . '/../../model/request.php';
 
-// var_dump(Admin::readJWT(Request::getAuthToken()));
-// var_dump(Request::getAuthToken());
-// $gerente = new GerenteSetor();
-if (!GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())) {
+if (!Tecnico::readJWTAndSet(Request::getAuthToken(), $tecnico = new Tecnico())) {
   echo json_encode(array(
     "error" => 400,
     "mensagem" => "Você não está autenticado",
   ));
   return false;
 }
-// return;
+// var_dump($tecnico);
 
-// var_dump($gerente);
-// return;
-// $data = json_decode(file_get_contents("php://input"));
-echo json_encode(array_map(function ($tecnico) {
-  return $tecnico->getJSON(array("chamados" => true));
+$data = json_decode(file_get_contents("php://input"));
+if (!empty($data->setor)) {
+
+  $setor = new Setor();
+  $setor->setNome($data->setor);
+  if ($setor->read(false)) {
+    $tecnico->setSetor($setor);
+  } else {
+    echo json_encode(array(
+      "error" => 404,
+      "mensagem" => "Setor não encontrado",
+    ));
+    return false;
+  }
+} else if (!empty($data->privilegiados)) {
+
+  $tecnico->getSetor()->setID(null);
+  $payload = array();
   // var_dump($tecnico);
-}, $gerente->readAllBySetor()));
+  // var_dump($tecnico->readAllBySetor());
+  foreach ($tecnico->readAllBySetor() as $tec) {
+    if ($tec->getCargo())
+      array_push($payload, $tec->getJSON(array("chamados" => true)));
+  }
+  //   var_dump($tec->cargo);
+  // }
+  echo json_encode($payload);
+
+  return;
+}
+echo json_encode(array_map(function ($ntecnico) {
+  return $ntecnico->getJSON(array("chamados" => true));
+  // var_dump($tecnico);
+}, $tecnico->readAllBySetor()));
 
 ?>

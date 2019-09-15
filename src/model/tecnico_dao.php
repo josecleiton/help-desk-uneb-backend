@@ -81,7 +81,7 @@ class TecnicoDAO extends DAO
   public function readAllBySetor($tecnico)
   {
 
-    if ($setor = $tecnico->getSetor()) {
+    if (($setor = $tecnico->getSetor()) && $setor->getID()) {
       $resultadoDB = $this->conn->prepare(
         "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
                 tecnico.id_setor, tecnico.cargo
@@ -91,12 +91,14 @@ class TecnicoDAO extends DAO
         WHERE setor.id = :setor"
       );
       $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+      // var_dump($setor);
     } else {
       $resultadoDB = $this->conn->prepare(
         "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
                 tecnico.id_setor, tecnico.cargo
         FROM ttecnico tecnico"
       );
+
       // echo "KKKKKA";
     }
     $resultadoDB->execute();
