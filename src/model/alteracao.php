@@ -11,6 +11,7 @@ class Alteracao
   private $situacao;
   private $prioridade;
   private $chamado;
+  // private $tecnico;
 
   function __construct($id = 0)
   {
@@ -87,10 +88,10 @@ class Alteracao
     $this->prioridade = $prioridade;
   }
 
-  public function create()
+  public function create($tecnico = null)
   {
     $dao = new AlteracaoDAO();
-    return $dao->create($this);
+    return $dao->create($this, $tecnico);
   }
 
   public function readAllByChamado()

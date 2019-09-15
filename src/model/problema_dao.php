@@ -20,20 +20,36 @@ class ProblemaDAO extends DAO
 
   public function read($problema)
   {
-    $resultadoDB = $this->conn->prepare(
-      "SELECT * FROM $this->table
+    if ($problema->getID()) {
+      $resultadoDB = $this->conn->prepare(
+        "SELECT * FROM $this->table
        WHERE id = :id"
-    );
-    // var_dump($problema);
-    $resultadoDB->bindValue(":id", $problema->getID(), PDO::PARAM_INT);
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount()) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
-      $problema->setDescricao($row["descricao"]);
-      $setor = new Setor();
-      $setor->setID($row["id_setor"]);
-      $problema->setSetor($setor->read(false));
-      return $problema;
+      );
+      // var_dump($problema);
+      $resultadoDB->bindValue(":id", $problema->getID(), PDO::PARAM_INT);
+      $resultadoDB->execute();
+      if ($resultadoDB->rowCount()) {
+        $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+        $problema->setDescricao($row["descricao"]);
+        $setor = new Setor();
+        $setor->setID($row["id_setor"]);
+        $problema->setSetor($setor->read(false));
+        return $problema;
+      }
+    } else {
+      $resultadoDB = $this->conn->prepare(
+        "SELECT id FROM $this->table
+         WHERE descricao = :descricao AND id_setor = :setor
+        "
+      );
+      $resultadoDB->bindValue(":descricao", $problema->getDescricao(), PDO::PARAM_STR);
+      $resultadoDB->bindValue(":setor", $problema->getSetor()->getID(), PDO::PARAM_INT);
+      $resultadoDB->execute();
+      if ($resultadoDB->rowCount()) {
+        $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+        $problema->setID($row["id"]);
+        return $problema;
+      }
     }
   }
 
@@ -47,8 +63,8 @@ class ProblemaDAO extends DAO
        WHERE id_setor = :setor"
     );
     $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+    $problemas = array();
     if ($resultadoDB->execute() && $resultadoDB->rowCount()) {
-      $problemas = array();
       while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
         $novoProblema = new Problema();
         $novoProblema->setID($row["id"]);
@@ -57,8 +73,7 @@ class ProblemaDAO extends DAO
           $novoProblema->setSetor($setor);
         array_push($problemas, $novoProblema);
       }
-      return $problemas;
     }
-    return null;
+    return $problemas;
   }
 }

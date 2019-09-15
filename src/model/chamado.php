@@ -1,5 +1,6 @@
 <?php
 require_once("chamado_dao.php");
+require_once("upload.php");
 
 class Chamado
 {
@@ -12,6 +13,7 @@ class Chamado
   protected $setor;
   protected $tecnico;
   protected $problema;
+  protected $arquivo;
 
   function __construct($id = 0)
   {
@@ -75,6 +77,11 @@ class Chamado
     return $this->problema;
   }
 
+  public function getArquivo()
+  {
+    return Upload::getCaminhoExterno($this->arquivo);
+  }
+
   protected function getAlteracoesJSON()
   {
     if (!$this->alteracoes) return;
@@ -87,6 +94,7 @@ class Chamado
   {
     $usuario = $this->getUsuario();
     $tecnico = $this->getTecnico();
+    // var_dump($tecnico);
     return array(
       "id" => $this->getID(),
       "descricao" => $this->getDescricao(),
@@ -95,13 +103,14 @@ class Chamado
       "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(array(
         "chamados" => true
       )),
-      "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico->getJSON(array(
+      "tecnico" => array_key_exists("tecnico", $nullVal) ? null : $tecnico ?  $tecnico->getJSON(array(
         "chamados" => true,
         "setor" => true,
-      )),
-      "tombo" => array_key_exists("tombo", $nullVal) ? null : $this->getTombo(),
+      )) : null,
+      "tombo" => $this->getTombo(),
       "setor" => array_key_exists("setor", $nullVal) ? null : $this->getSetor()->getJSON(),
       "problema" => ($problema = $this->getProblema()) ? $problema->getJSON() : null,
+      "arquivo" => $this->getArquivo(),
     );
   }
 
@@ -150,6 +159,11 @@ class Chamado
     $this->problema = $problema;
   }
 
+  public function setArquivo($arquivo)
+  {
+    $this->arquivo = $arquivo;
+  }
+
   public function delete()
   {
     $dao = new ChamadoDAO();
@@ -175,5 +189,11 @@ class Chamado
   {
     $dao = new ChamadoDAO();
     return $dao->readByID($this, $populate);
+  }
+
+  public function update()
+  {
+    $dao = new ChamadoDAO();
+    return $dao->update($this);
   }
 }

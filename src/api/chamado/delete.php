@@ -6,17 +6,20 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require_once(dirname(__FILE__).  '/../../model/chamado.php');
+require_once(dirname(__FILE__) .  '/../../model/chamado.php');
 
 $data = json_decode(file_get_contents("php://input"));
 
-if(empty($data->id)) {
-  // http_response_code(400);
+if (empty($data->id)) {
+  echo json_encode(array(
+    "error" => 400,
+    "mensagem" => "Deve-se fornecer id",
+  ));
   return;
 }
 
 $chamado = new Chamado($data->id);
-if($chamado->delete()) {
+if ($chamado->delete()) {
   // http_response_code(200);
   echo json_encode(array(
     "mensagem" => "Chamado excluído",

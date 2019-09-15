@@ -57,6 +57,7 @@ class Tecnico extends Usuario
   {
     $ch = new Chamado();
     $ch->setSetor($this->setor);
+    // var_dump($ch);
     // $payload = $ch->readBySetor();
     // var_dump($payload);
     // return [];
@@ -84,12 +85,15 @@ class Tecnico extends Usuario
 
   public function getJSON($nullVal = array())
   {
+    $setor = $this->getSetor();
+    // var_dump($this);
     return array(
       "nome" => $this->getNome(),
       "login" => $this->getLogin(),
       "email" => $this->getEmail(),
       "telefone" => $this->getTelefone(),
-      "setor" => array_key_exists("setor", $nullVal) ? null : $this->getSetor()->getJSON(),
+      "cargo" => $this->cargo ? $this->cargo : 'T',
+      "setor" => array_key_exists("setor", $nullVal) ? null : $setor ? $this->getSetor()->getJSON() : null,
       "chamados" => array_key_exists("chamados", $nullVal) ? null : $this->getChamadosJSON(array("tecnico" => true)),
     );
   }
@@ -122,6 +126,12 @@ class Tecnico extends Usuario
     return $dao->read($this, $spread);
   }
 
+  public function readAllBySetor()
+  {
+    $dao = new TecnicoDAO();
+    return $dao->readAllBySetor($this);
+  }
+
   public function login($senha)
   {
     $dao = new TecnicoDAO();
@@ -130,6 +140,9 @@ class Tecnico extends Usuario
 
   public function toJWT()
   {
+    if ($this->setor) {
+      $setor = $this->setor->getID();
+    }
     $token = array(
       "nome" => $this->getNome(),
       "login" => $this->getLogin(),
@@ -137,6 +150,7 @@ class Tecnico extends Usuario
       "email" => $this->getEmail(),
       "cargo" => $this->getCargo(),
       "telefone" => $this->getTelefone(),
+      "setor" => $setor,
       "logado_em" => time(),
     );
     return array($token, JWT::encode($token, ENV::getAppKey()));
@@ -163,6 +177,9 @@ class Tecnico extends Usuario
     $tecnico->setSenha($decoded->senha);
     $tecnico->setEmail($decoded->email);
     $tecnico->setCargo($decoded->cargo);
+    $setor = new Setor();
+    $setor->setID($decoded->setor);
+    $tecnico->setSetor($setor);
     return $tecnico;
   }
 
@@ -182,6 +199,11 @@ class Tecnico extends Usuario
   {
     $dao = new TecnicoDAO();
     return $dao->auth($this, $this->senha);
+  }
+
+  public function cadastraAlteracao($alteracao)
+  {
+    return $alteracao->create($this);
   }
 
   public function atendeChamado($chamado)

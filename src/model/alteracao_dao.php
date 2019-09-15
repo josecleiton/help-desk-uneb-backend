@@ -30,20 +30,26 @@ class AlteracaoDAO extends DAO
     return $alteracoes;
   }
 
-  public function create($alteracao)
+  public function create($alteracao, $tecnico)
   {
-    $query = "INSERT INTO $this->table (data, descricao, id_chamado, id_situacao, id_prioridade)
-                VALUES (:data, :descricao, :idchamado, :idsituacao, :idprioridade)";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->bindValue(":data", $alteracao->getData(), PDO::PARAM_STR);
+    // var_dump($tecnico);
+    $resultadoDB = $this->conn->prepare(
+      "INSERT INTO $this->table (data, descricao, id_chamado, id_situacao, id_prioridade, id_tecnico)
+                VALUES (:data, :descricao, :idchamado, :idsituacao, :idprioridade, :tecnico)"
+    );
+    if (!($data = $alteracao->getData())) {
+      $data = Date("Y-m-d H:i:s");
+    }
+    $resultadoDB->bindParam(":data", $data, PDO::PARAM_STR);
     $resultadoDB->bindValue(":descricao", $alteracao->getDescricao(), PDO::PARAM_STR);
     $resultadoDB->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);
     $resultadoDB->bindValue(":idsituacao", $alteracao->getSituacao()->getID(), PDO::PARAM_INT);
     $resultadoDB->bindValue(":idprioridade", $alteracao->getPrioridade()->getID(), PDO::PARAM_INT);
+    $resultadoDB->bindValue(":tecnico", $tecnico ? $tecnico->getLogin() : null, PDO::PARAM_STR);
     if ($resultadoDB->execute()) {
       $alteracao->setID($this->conn->lastInsertId());
       return true;
     }
-    return false;
+    throw new Exception("Deu ruim");
   }
 }

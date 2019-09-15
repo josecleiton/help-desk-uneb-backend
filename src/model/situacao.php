@@ -46,6 +46,28 @@ class Situacao
     $this->cor = $cor;
   }
 
+  public function setID($id)
+  {
+    $this->id = $id;
+  }
+
+  public static function validaMudancaDeSituacao($sitAntes, $sitDepois)
+  {
+    $nomeAntes = $sitAntes->getNome();
+    $nomeDepois = $sitDepois->getNome();
+    if ($nomeAntes === 'Em Aberto') {
+      return $nomeDepois === 'Em Atendimento' || $nomeDepois === 'Transferido';
+    } else if ($nomeAntes === 'Em Atendimento') {
+      return $nomeDepois === 'Transferido' || $nomeDepois === 'Pendente' || $nomeDepois === 'Concluido';
+    } else if ($nomeAntes === 'Pendente') {
+      return $nomeDepois === 'Em Atendimento';
+    } else if ($nomeAntes === 'Pendente') {
+      return $nomeDepois === 'Em Atendimento';
+    } else if ($nomeAntes === 'Transferido') {
+      return $nomeDepois === 'Em Atendimento';
+    }
+  }
+
   public function read()
   {
     $dao = new SituacaoDAO();

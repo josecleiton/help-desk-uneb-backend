@@ -11,18 +11,22 @@ require_once dirname(__FILE__) . '/../../model/request.php';
 
 // var_dump(Admin::readJWT(Request::getAuthToken()));
 // var_dump(Request::getAuthToken());
-$gerente = new GerenteSetor();
-if (!GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente)) {
+// $gerente = new GerenteSetor();
+if (!GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())) {
   echo json_encode(array(
     "error" => 400,
     "mensagem" => "Você não está autenticado",
   ));
   return false;
 }
+// return;
 
+// var_dump($gerente);
+// return;
 // $data = json_decode(file_get_contents("php://input"));
 echo json_encode(array_map(function ($tecnico) {
-  return $tecnico->getJSON();
-}, $gerente->readBySetor()));
+  return $tecnico->getJSON(array("chamados" => true));
+  // var_dump($tecnico);
+}, $gerente->readAllBySetor()));
 
 ?>

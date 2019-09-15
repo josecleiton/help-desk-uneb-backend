@@ -18,6 +18,7 @@ class SituacaoDAO extends DAO
     $resultadoDB->execute();
     if ($resultadoDB->rowCount() == 1) {
       $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+      $situacao->setID($row["id"]);
       $situacao->setNome($row["nome"]);
       $situacao->setCor("#" . $row["cor"]);
       return $situacao;
