@@ -62,11 +62,30 @@ class Tecnico extends Usuario
     // var_dump($payload);
     // return [];
     $chamados = array();
-    foreach ($ch->readBySetor() as $item) {
-      // var_dump($item->getSituacao());
-      // var_dump($item);
-      if ($item->getSituacao()->getNome() === $situacao->getNome())
-        array_push($chamados, $item);
+    if ($situacao->getNome() === 'Em Aberto') {
+      // echo "KKKKK";
+      // var_dump($ch);
+      foreach ($ch->readBySetor() as $item) {
+        // var_dump($item->getSituacao());
+        // var_dump($item);
+
+        $itemSituacao = $item->getSituacao();
+        // var_dump($item->getTecnico());
+        // var_dump($itemSituacao);
+        // var_dump($item);
+        if (
+          $itemSituacao->getNome() === $situacao->getNome() ||
+          !$item->getTecnico() || ($itemSituacao->getNome() === 'Transferido' && $item->getTecnico()->getLogin() === $this->login)
+        )
+          array_push($chamados, $item);
+      }
+    } else {
+      foreach ($ch->readBySetor() as $item) {
+        // var_dump($item->getSituacao());
+        // var_dump($item);
+        if ($item->getSituacao()->getNome() === $situacao->getNome())
+          array_push($chamados, $item);
+      }
     }
     return $chamados;
   }

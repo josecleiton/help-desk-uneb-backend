@@ -23,7 +23,7 @@ if (!Tecnico::readJWTAndSet(Request::getAuthToken(), $tecnico = new Tecnico())) 
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->id) || empty($data->situacao) || empty($data->nova_situacao) || empty($data->prioridade)) {
+if (empty($data->id) || empty($data->situacao) || empty($data->nova_situacao)) {
   echo json_encode(array(
     "error" => 400,
     "mensagem" => "Nem todos os campos foram preenchidos",
@@ -32,15 +32,6 @@ if (empty($data->id) || empty($data->situacao) || empty($data->nova_situacao) ||
 }
 
 
-$prioridade = new Prioridade();
-$prioridade->setDescricao($data->prioridade);
-if (!$prioridade->read()) {
-  echo json_encode(array(
-    "error" => 404,
-    "mensagem" => "Prioridade não cadastrada.",
-  ));
-  return false;
-}
 $situacaoAntes = new Situacao();
 $situacaoAntes->setNome($data->situacao);
 $situacaoDepois = new Situacao();
@@ -69,7 +60,7 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
   // var_dump($setor);
   $tecnicoCh = $chamado->getTecnico();
   $alteracao = new Alteracao();
-  $alteracao->setPrioridade($prioridade);
+  // $alteracao->setPrioridade($prioridade);
   $alteracao->setSituacao($situacaoDepois);
   $alteracao->setChamado($chamado);
   $alteracao->setDescricao($data->descricao);
@@ -82,6 +73,7 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
         ));
         return false;
       }
+      $alteracao->setPrioridade($chamado->getAlteracao()->getPrioridade());
       $situacaoAntesNome = $situacaoAntes->getNome();
       $situacaoDepoisNome = $situacaoDepois->getNome();
       if (empty($data->descricao)) {
@@ -109,12 +101,39 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
       }
     } else {
       // var_dump($tecnico);
-      if (empty($data->novo_setor) && empty($data->novo_tecnico)) {
+      $prioridade = new Prioridade();
+      $prioridade->setDescricao($data->prioridade);
+      if (!$prioridade->read()) {
         echo json_encode(array(
-          "error" => 400,
-          "mensagem" => "Novas informações devem ser fornecidas (novo setor ou novo técnico)."
+          "error" => 404,
+          "mensagem" => "Prioridade não cadastrada.",
         ));
         return false;
+      }
+      $alteracao->setPrioridade($prioridade);
+      if (empty($data->novo_setor) && empty($data->novo_tecnico)) {
+        if ($situacaoDepois->getNome() === 'Transferido') {
+          echo json_encode(array(
+            "error" => 400,
+            "mensagem" => "Novas informações devem ser fornecidas (novo setor ou novo técnico)."
+          ));
+          return false;
+        } else {
+          if (empty($data->descricao)) {
+            $alteracao->setDescricao("Atendido por " . $tecnico->getNome());
+          }
+          try {
+            $tecnico->cadastraAlteracao($alteracao);
+            $chamado->setTecnico($tecnico);
+            $chamado->update();
+          } catch (\Exception $e) {
+            echo json_encode(array(
+              "error" => 500,
+              "mensagem" => $e->getMessage()
+            ));
+            return false;
+          }
+        }
       } else {
         if (empty($setor)) {
           echo json_encode(array(
@@ -123,7 +142,10 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
           ));
           return false;
         }
+        $novoSetor = null;
         if ($data->novo_setor !== $setor->getNome()) {
+          // var_dump($setor);
+          // var_dump($prioridade);
           $novoSetor = new Setor();
           $novoSetor->setNome($data->novo_setor);
           if (!$novoSetor->read(false)) {
@@ -135,6 +157,14 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
           }
           $chamado->setSetor($novoSetor);
           $alteracao->setDescricao("Transferência de " . $setor->getNome() . " para " . $novoSetor->getNome());
+        } else if (empty($data->novo_tecnico)) {
+          echo json_encode(array(
+            "error" => 409,
+            "mensagem" => "Deve-se transferir para um técnico",
+          ));
+          return false;
+        } else {
+          $novoSetor = $setor;
         }
         $chamado->setTecnico(null);
         if (!empty($data->novo_tecnico)) {
@@ -147,13 +177,16 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
             ));
             return false;
           }
-          if (!$novoTecnico->read()) {
+          $novoTecnico->read();
+          if (!$novoTecnico->getNome()) {
+            // var_dump($novoTecnico);
             echo json_encode(array(
               "error" => 404,
               "mensagem" => "Tecnico não encontrado",
             ));
             return false;
           }
+          var_dump($novoTecnico);
           if ($novoTecnico->getSetor() && $novoTecnico->getSetor()->getNome() !== $novoSetor->getNome()) {
             echo json_encode(array(
               "error" => 404,

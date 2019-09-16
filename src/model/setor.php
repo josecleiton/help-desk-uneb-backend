@@ -110,4 +110,9 @@ class Setor
     $dao = new SetorDAO();
     return $dao->delete($this);
   }
+  public function update()
+  {
+    $dao = new SetorDAO();
+    return $dao->update($this);
+  }
 }

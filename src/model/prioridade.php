@@ -27,7 +27,7 @@ class Prioridade
     );
   }
 
-  public function setDescricao($descricao)
+  public function setDescricao($descricao = 'Baixa')
   {
     $this->descricao = $descricao;
   }

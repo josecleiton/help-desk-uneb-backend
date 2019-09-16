@@ -5,13 +5,23 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-require_once(dirname(__FILE__).  '/../../model/tecnico.php');
-require_once(dirname(__FILE__).  '/../../model/setor.php');
+require_once dirname(__FILE__) . '/../../model/gerente_setor.php';
+require_once dirname(__FILE__) . '/../../model/request.php';
+
+if (!GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())) {
+  echo json_encode(array(
+    "error" => 400,
+    "mensagem" => "Você não está autenticado",
+  ));
+  return false;
+}
 
 $data = json_decode(file_get_contents("php://input"));
 
-if(empty($data->nome) || empty($data->email) || empty($data->telefone)
-   || empty($data->login) || empty($data->setor) || empty($data->senha)) {
+if (
+  empty($data->nome) || (empty($data->email) || !filter_var($data->email, FILTER_VALIDATE_EMAIL)) || empty($data->telefone)
+  || empty($data->login) || empty($data->setor) || empty($data->senha)
+) {
   echo json_encode(array(
     "error" => 400,
     "mensagem" => "Requerido: nome, email, telefone, senha e setor do Técnico.",
@@ -19,9 +29,17 @@ if(empty($data->nome) || empty($data->email) || empty($data->telefone)
   return false;
 }
 
+if (strlen($data->senha) <= 6) {
+  echo json_encode(array(
+    "error" => 400,
+    "mensagem" => "Senha muito curta",
+  ));
+  return false;
+}
+
 $setor = new Setor();
 $setor->setNome($data->setor);
-if($setor->read()) {
+if ($setor->read(false)) {
   $tecnico = new  Tecnico();
   $tecnico->setLogin($data->login);
   $tecnico->setNome($data->nome);
@@ -29,12 +47,13 @@ if($setor->read()) {
   $tecnico->setTelefone($data->telefone);
   $tecnico->setSenha($data->senha);
   $tecnico->setSetor($setor);
-  if($tecnico->create()) {
+  try {
+    $gerente->createTecnico($tecnico);
     echo json_encode($tecnico->getJSON());
-  } else {
+  } catch (\Exception $e) {
     echo json_encode(array(
       "error" => 409,
-      "mensagem" => "Erro na criação de Técnico.",
+      "mensagem" => $e->getMessage(),
     ));
   }
 } else {
@@ -43,7 +62,3 @@ if($setor->read()) {
     "mensagem" => "Setor inválido.",
   ));
 }
-
-
-
-?>

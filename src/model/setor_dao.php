@@ -121,4 +121,18 @@ class SetorDAO extends DAO
     $resultadoDB->execute();
     return $resultadoDB->rowCount();
   }
+  public function update($setor)
+  {
+    $resultadoDB = $this->conn->prepare(
+      "UPDATE $this->table 
+      SET nome = :nome, email = :email, telefone = :telefone
+      WHERE id = :setor"
+    );
+    $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":email", $setor->getEmail(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":telefone", $setor->getTelefone(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+    $resultadoDB->execute();
+    return $resultadoDB->rowCount();
+  }
 }

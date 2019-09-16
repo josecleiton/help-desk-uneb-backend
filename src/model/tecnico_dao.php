@@ -7,12 +7,11 @@ class TecnicoDAO extends DAO
   protected $table = "ttecnico";
   public function read($tecnico, $spread)
   {
-    if (!$tecnico->getLogin()) return;
+    if (!$tecnico->getLogin()) return $tecnico;
     $resultadoDB = $this->conn->prepare(
       "SELECT * FROM $this->table WHERE login = :login"
     );
     // $login = $tecnico->getLogin();
-    // var_dump($login);
     $resultadoDB->bindValue(":login", $tecnico->getLogin(), PDO::PARAM_STR);
     $resultadoDB->execute();
     if ($resultadoDB->rowCount() == 1) {
@@ -20,6 +19,9 @@ class TecnicoDAO extends DAO
       $tecnico->setNome($row["nome"]);
       $tecnico->setEmail($row["email"]);
       $tecnico->setTelefone($row["telefone"]);
+      $setor = new Setor();
+      $setor->setID($row["id_setor"]);
+      $tecnico->setSetor($setor->read(false));
       if ($spread["chamados"]) {
         $chamadoDAO = new ChamadoDAO();
         $tecnico->setChamados($chamadoDAO->readByTecnico($tecnico));
@@ -32,7 +34,10 @@ class TecnicoDAO extends DAO
   {
     $resultadoDB = $this->conn->prepare("DELETE FROM $this->table WHERE login = :login");
     $resultadoDB->bindValue(":login", $tecnico->getLogin(), PDO::PARAM_STR);
-    return $resultadoDB->execute();
+    $resultadoDB->execute();
+    if ($resultadoDB->rowCount())
+      return $tecnico;
+    throw new Exception("Erro ao excluir técnico " . $tecnico->getNome());
   }
 
   public function auth($tecnico, $senha)
