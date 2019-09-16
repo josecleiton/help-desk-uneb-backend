@@ -30,7 +30,7 @@ class AlteracaoDAO extends DAO
     return $alteracoes;
   }
 
-  public function create($alteracao, $tecnico)
+  public function create($alteracao)
   {
     // var_dump($tecnico);
     $resultadoDB = $this->conn->prepare(
@@ -40,6 +40,7 @@ class AlteracaoDAO extends DAO
     if (!($data = $alteracao->getData())) {
       $data = Date("Y-m-d H:i:s");
     }
+    $tecnico = $alteracao->getTecnico();
     $resultadoDB->bindParam(":data", $data, PDO::PARAM_STR);
     $resultadoDB->bindValue(":descricao", $alteracao->getDescricao(), PDO::PARAM_STR);
     $resultadoDB->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);

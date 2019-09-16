@@ -132,61 +132,6 @@ class ChamadoDAO extends DAO
     return $this->read($resultadoDB, array("tecnico" => true, "usuario" => true, "setor" => true));
   }
 
-  // public function readEmAberto($setor)
-  // {
-  //   if ($setor) {
-  //     $query = "SELECT chamado.id, chamado.descricao, chamado.data, chamado.ti, 
-  //                       chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
-  //                    chamado.id_setor
-  //              FROM tchamado chamado
-  //              INNER JOIN talteracao alteracao
-  //                 ON chamado.id = alteracao.id_chamado
-  //              GROUP BY chamado.id, chamado.descricao, chamado.data, chamado.ti, 
-  //                    chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
-  //                    chamado.id_setor 
-  //              HAVING count(*) = 1 AND chamado.id_setor = :setor
-  //        ";
-  //     $resultadoDB = $this->conn->prepare($query);
-  //     $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
-  //     // var_dump($setor);
-  //     // $resultadoDB->debugDumpParams();
-  //   } else {
-  //     $query = "SELECT chamado.id, chamado.descricao, chamado.data, chamado.ti, 
-  //                       chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
-  //                    chamado.id_setor
-  //              FROM tchamado chamado
-  //              INNER JOIN talteracao alteracao
-  //                 ON chamado.id = alteracao.id_chamado
-  //              GROUP BY chamado.id, chamado.descricao, chamado.data, chamado.ti, 
-  //                    chamado.tombo, chamado.id_tecnico, chamado.id_usuario,
-  //                    chamado.id_setor 
-  //              HAVING count(*) = 1
-  //        ";
-  //     $resultadoDB = $this->conn->prepare($query);
-  //   }
-  //   $resultadoDB->execute();
-
-  //   $chamados = array();
-  //   while ($row = $resultadoDB->fetch(PDO::FETCH_ASSOC)) {
-  //     $chamado = new Chamado();
-  //     $chamado->setID($row["id"]);
-  //     $chamado->setDescricao($row["descricao"]);
-  //     $chamado->setData($row["data"]);
-  //     $chamado->setTombo($row["tombo"]);
-  //     $setor = new Setor();
-  //     $setor->setID($row["id_setor"]);
-  //     $chamado->setSetor($setor->read());
-  //     $tecnico = new Tecnico();
-  //     $tecnico->setLogin($row["id_tecnico"]);
-  //     $chamado->setTecnico($tecnico->read(array("chamados" => false)));
-  //     $usuario = new Usuario();
-  //     $usuario->setCPF($row["id_usuario"]);
-  //     $chamado->setUsuario($usuario->read(array("chamados" => false)));
-  //     array_push($chamados, $chamado);
-  //   }
-  //   return $chamados;
-  // }
-
   public function delete($chamado)
   {
     $resultadoDB = $this->conn->prepare("DELETE FROM $this->table WHERE id = :chamado");

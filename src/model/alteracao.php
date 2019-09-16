@@ -2,6 +2,7 @@
 <?php
 
 require_once('alteracao_dao.php');
+require_once('email.php');
 
 class Alteracao
 {
@@ -11,7 +12,7 @@ class Alteracao
   private $situacao;
   private $prioridade;
   private $chamado;
-  // private $tecnico;
+  private $tecnico;
 
   function __construct($id = 0)
   {
@@ -58,6 +59,11 @@ class Alteracao
     return $this->chamado;
   }
 
+  public function getTecnico()
+  {
+    return $this->tecnico;
+  }
+
   public function setID($id)
   {
     $this->id = $id;
@@ -88,10 +94,23 @@ class Alteracao
     $this->prioridade = $prioridade;
   }
 
-  public function create($tecnico = null)
+  public function setTecnico($tecnico)
+  {
+    $this->tecnico = $tecnico;
+  }
+
+  public function create()
   {
     $dao = new AlteracaoDAO();
-    return $dao->create($this, $tecnico);
+    try {
+      $dao->create($this);
+      // $mailer = new Email($this);
+      // $mailer->send();
+      return true;
+    } catch (\Exception $e) {
+      echo $e->getMessage();
+      return false;
+    }
   }
 
   public function readAllByChamado()

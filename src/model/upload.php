@@ -17,10 +17,10 @@ class Upload
     // $this->caminho = $baseDir . time() . "_" . $file["name"];
     $this->caminhoRelativo = time() . '_' . basename($file["name"]);
     $this->caminho = $baseDir . $this->caminhoRelativo;
-    if (!getimagesize($file["tmp_name"])) {
-      throw new Exception("Arquivo não suportado");
-    }
-    if ($file["size"] > 1000 * 1024) {
+    // if (!getimagesize($file["tmp_name"])) {
+    //   throw new Exception("Arquivo não suportado");
+    // }
+    if ($file["size"] > 8000 * 1024) {
       throw new Exception("Arquivo muito grande");
     }
     if (!is_writable($baseDir)) {

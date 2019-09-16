@@ -44,7 +44,7 @@ if (!$situacaoAntes->read() || !$situacaoDepois->read()) {
   return false;
 }
 $chamado = new Chamado($data->id);
-if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
+if ($chamado->read(array("tecnico" => true, "usuario" => true))) {
   // var_dump($chamado);
   if (!empty($data->tombo)) {
     $chamado->setTombo($data->tombo);
@@ -102,7 +102,11 @@ if ($chamado->read(array("tecnico" => true, "usuario" => false))) {
     } else {
       // var_dump($tecnico);
       $prioridade = new Prioridade();
-      $prioridade->setDescricao($data->prioridade);
+      if (!$data->prioridade) {
+        $prioridade->setID(1);
+      } else {
+        $prioridade->setDescricao($data->prioridade);
+      }
       if (!$prioridade->read()) {
         echo json_encode(array(
           "error" => 404,

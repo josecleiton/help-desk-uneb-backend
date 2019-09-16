@@ -38,7 +38,7 @@ if ($tecnico->getNome()) {
     ));
   } catch (\Exception $e) {
     echo json_encode(array(
-      "error" => 500,
+      "error" => 400,
       "mensagem" => $e->getMessage(),
     ));
   }

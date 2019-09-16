@@ -18,7 +18,7 @@ class GerenteSetor extends Tecnico
 
   public function createTecnico($tecnico)
   {
-    if ($this->cargo === 'G' && $tecnico->getSetor()->getID() !== $this->setor->getID()) {
+    if (!$this->cargo || ($this->cargo === 'G' && $tecnico->getSetor()->getID() !== $this->setor->getID())) {
       throw new Exception("Setor inválido");
     }
     return $tecnico->create();
@@ -26,10 +26,19 @@ class GerenteSetor extends Tecnico
 
   public function deleteTecnico($tecnico)
   {
-    if ($this->cargo === 'G' && $tecnico->getSetor()->getID() !== $this->setor->getID()) {
+    if (!$this->cargo || ($this->cargo === 'G' && $tecnico->getSetor()->getID() !== $this->setor->getID())) {
       throw new Exception("Setor inválido");
     }
     return $tecnico->delete();
+  }
+
+  public function updateTecnico($tecnico)
+  {
+    if (!$this->cargo || ($this->cargo === 'G' && $tecnico->getSetor()->getID() !== $this->setor->getID())) {
+      throw new Exception("Setor inválido");
+    }
+    // var_dump($tecnico);
+    return $tecnico->update();
   }
 
   public function create()

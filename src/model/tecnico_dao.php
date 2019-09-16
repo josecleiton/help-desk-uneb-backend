@@ -1,4 +1,7 @@
 <?php
+
+use PHPMailer\PHPMailer\Exception;
+
 require_once "dao.php";
 require_once "chamado_dao.php";
 
@@ -17,6 +20,7 @@ class TecnicoDAO extends DAO
     if ($resultadoDB->rowCount() == 1) {
       $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
       $tecnico->setNome($row["nome"]);
+      $tecnico->setSenha($row["senha"]);
       $tecnico->setEmail($row["email"]);
       $tecnico->setTelefone($row["telefone"]);
       $setor = new Setor();
@@ -89,7 +93,7 @@ class TecnicoDAO extends DAO
     if (($setor = $tecnico->getSetor()) && $setor->getID()) {
       $resultadoDB = $this->conn->prepare(
         "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
-                tecnico.id_setor, tecnico.cargo
+                tecnico.id_setor, tecnico.cargo, tecnico.senha
         FROM ttecnico tecnico
         INNER JOIN tsetor setor
           ON tecnico.id_setor = setor.id
@@ -100,7 +104,7 @@ class TecnicoDAO extends DAO
     } else {
       $resultadoDB = $this->conn->prepare(
         "SELECT tecnico.login, tecnico.nome, tecnico.email, tecnico.telefone,
-                tecnico.id_setor, tecnico.cargo
+                tecnico.id_setor, tecnico.cargo, tecnico.senha
         FROM ttecnico tecnico"
       );
 
@@ -115,6 +119,7 @@ class TecnicoDAO extends DAO
         $novoTecnico->setNome($row["nome"]);
         $novoTecnico->setEmail($row["email"]);
         $novoTecnico->setTelefone($row["telefone"]);
+        $novoTecnico->setSenha($row["senha"]);
         if ($row["id_setor"]) {
           $setor = new Setor();
           $setor->setID($row["id_setor"]);
@@ -127,5 +132,28 @@ class TecnicoDAO extends DAO
       // echo "KKKK";
     }
     return $tecnicos;
+  }
+
+  public function update($tecnico)
+  {
+    $resultadoDB = $this->conn->prepare(
+      "UPDATE $this->table
+       SET nome = :nome, email = :email, telefone = :telefone, id_setor = :setor, senha = :senha
+       WHERE login = :tecnico
+      "
+    );
+    $setor = $tecnico->getSetor();
+    $resultadoDB->bindValue(":nome", $tecnico->getNome(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":email", $tecnico->getEmail(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":telefone", $tecnico->getTelefone(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":setor", $setor ? $setor->getID() : null);
+    $resultadoDB->bindValue(":senha", $tecnico->getSenha(), PDO::PARAM_STR);
+    $resultadoDB->bindValue(":tecnico", $tecnico->getLogin(), PDO::PARAM_STR);
+    $resultadoDB->execute();
+    if ($resultadoDB->rowCount()) {
+      return true;
+    } else {
+      throw new Exception("Falha na atualização do técnico");
+    }
   }
 }

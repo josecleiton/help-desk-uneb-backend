@@ -20,6 +20,11 @@ class Tecnico extends Usuario
     return $this->login;
   }
 
+  public function getSenha()
+  {
+    return $this->senha;
+  }
+
   public function getSetor()
   {
     if ($this->setor || $this->cargo === 'A') {
@@ -214,6 +219,12 @@ class Tecnico extends Usuario
     return $dao->delete($this);
   }
 
+  public function update()
+  {
+    $dao = new TecnicoDAO();
+    return $dao->update($this);
+  }
+
   public function auth()
   {
     $dao = new TecnicoDAO();
@@ -222,7 +233,8 @@ class Tecnico extends Usuario
 
   public function cadastraAlteracao($alteracao)
   {
-    return $alteracao->create($this);
+    $alteracao->setTecnico($this);
+    return $alteracao->create();
   }
 
   public function atendeChamado($chamado)

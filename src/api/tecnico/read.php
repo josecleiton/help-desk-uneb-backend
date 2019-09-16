@@ -19,6 +19,21 @@ if (!Tecnico::readJWTAndSet(Request::getAuthToken(), $tecnico = new Tecnico())) 
 // var_dump($tecnico);
 
 $data = json_decode(file_get_contents("php://input"));
+
+if (!empty($data->login)) {
+  $tec = new Tecnico();
+  $tec->setLogin($data->login);
+  if ($tec->read()) {
+    echo json_encode($tec->getJSON(array("chamados" => true)));
+    return;
+  }
+  echo json_encode(array(
+    "error" => 404,
+    "mensagem" => "Técnico não encontrado"
+  ));
+  return;
+}
+
 if (!empty($data->setor)) {
 
   $setor = new Setor();

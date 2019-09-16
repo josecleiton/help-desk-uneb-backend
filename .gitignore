@@ -1,3 +1,5 @@
 vendor/
 composer.lock
 src/images
+email.php
+thread.php
