@@ -33,12 +33,16 @@ class Setor
 
   public function getProblemas()
   {
-    if ($this->problemas) {
+    // var_dump($this->problemas === null);
+    if ($this->problemas === null) {
       return $this->problemas;
     } else {
-      $problemDAO = new ProblemaDAO();
-      $this->setProblemas($problemDAO->read($this));
-      return $this->problemas();
+      // $problemDAO = new ProblemaDAO();
+      // $this->setProblemas($problemDAO->read($this));
+      $problema = new Problema();
+      $problema->setSetor($this);
+      $this->setProblemas($problema->readAllBySetor());
+      return $this->problemas;
     }
   }
 

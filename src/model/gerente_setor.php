@@ -31,6 +31,13 @@ class GerenteSetor extends Tecnico
     }
     return $tecnico->delete();
   }
+  public function deleteProblema($problema)
+  {
+    if (!$this->cargo || ($this->cargo === 'G' && $problema->getSetor()->getID() !== $this->setor->getID())) {
+      throw new Exception("Setor inválido");
+    }
+    return $problema->delete();
+  }
 
   public function updateTecnico($tecnico)
   {

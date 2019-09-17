@@ -20,7 +20,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (
   empty($data->nome) || (empty($data->email) || !filter_var($data->email, FILTER_VALIDATE_EMAIL)) || empty($data->telefone)
-  || empty($data->login) || empty($data->setor) || empty($data->senha)
+  || empty($data->login) || empty($data->setor)
 ) {
   echo json_encode(array(
     "error" => 400,
@@ -29,13 +29,13 @@ if (
   return false;
 }
 
-if (strlen($data->senha) <= 6) {
-  echo json_encode(array(
-    "error" => 400,
-    "mensagem" => "Senha muito curta",
-  ));
-  return false;
-}
+// if (strlen($data->senha) <= 6) {
+//   echo json_encode(array(
+//     "error" => 400,
+//     "mensagem" => "Senha muito curta",
+//   ));
+//   return false;
+// }
 
 $setor = new Setor();
 $setor->setNome($data->setor);
@@ -45,7 +45,11 @@ if ($setor->read(false)) {
   $tecnico->setNome($data->nome);
   $tecnico->setEmail($data->email);
   $tecnico->setTelefone($data->telefone);
-  $tecnico->setSenha($data->senha);
+  if (!empty($data->senha)) {
+    $tecnico->setSenha($data->senha);
+  } else {
+    $tecnico->setSenha("senhafraca");
+  }
   $tecnico->setSetor($setor);
   try {
     $gerente->createTecnico($tecnico);

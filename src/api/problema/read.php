@@ -7,10 +7,33 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 require_once dirname(__FILE__) . '/../../model/problema.php';
 require_once dirname(__FILE__) . '/../../model/setor.php';
+require_once dirname(__FILE__) . '/../../model/gerente_setor.php';
+require_once dirname(__FILE__) . '/../../model/request.php';
+
 
 // var_dump(Admin::readJWT(Request::getAuthToken()));
 // var_dump(Request::getAuthToken());
 $data = json_decode(file_get_contents("php://input"));
+
+if (GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())) {
+  if (($setor = $gerente->getSetor()) && $setor->getID()) {
+    if ($setor->read()) {
+      // var_dump($setor);
+      // var_dump($setor->getProblemas());
+      echo json_encode(array_map(function ($problema) {
+        // var_dump($problema);
+        return $problema->getJSON();
+      }, $setor->getProblemas()));
+    } else {
+      echo json_encode(array(
+        "error" => 404,
+        "mensagem" => "Setor inválido",
+      ));
+    }
+
+    return;
+  }
+}
 
 if (empty($data->setor)) {
   echo json_encode(array(

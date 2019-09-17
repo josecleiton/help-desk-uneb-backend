@@ -50,6 +50,13 @@ if ($tecnico->getNome()) {
     $tecnico->setNome($data->nome);
   }
   if ($data->setor) {
+    if ($tecnico->getCargo() === 'A') {
+      echo json_encode(array(
+        "error" => 409,
+        "mensagem" => "Técnico não tem setor",
+      ));
+      return false;
+    }
     $setor = new Setor();
     $setor->setNome($data->setor);
     if (!$setor->read(false)) {

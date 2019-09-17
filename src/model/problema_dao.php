@@ -76,4 +76,16 @@ class ProblemaDAO extends DAO
     }
     return $problemas;
   }
+
+  public function delete($problema)
+  {
+    $resultadoDB = $this->conn->prepare(
+      "DELETE FROM $this->table
+       WHERE id = :problema"
+    );
+    // var_dump($problema);
+    $resultadoDB->bindValue(":problema", $problema->getID(), PDO::PARAM_INT);
+    $resultadoDB->execute();
+    return $resultadoDB->rowCount();
+  }
 }

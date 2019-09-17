@@ -24,11 +24,11 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (
   empty($data->nome) || empty($data->email) || empty($data->telefone)
-  || empty($data->login) || empty($data->setor) || empty($data->senha)
+  || empty($data->login) || empty($data->setor)
 ) {
   echo json_encode(array(
     "error" => 400,
-    "mensagem" => "Requerido: nome, email, telefone, senha e setor do Técnico.",
+    "mensagem" => "Requerido: nome, email, telefone, senha e setor do Gerente.",
   ));
   return false;
 }
@@ -41,7 +41,11 @@ if ($setor->read()) {
   $gerente->setNome($data->nome);
   $gerente->setEmail($data->email);
   $gerente->setTelefone($data->telefone);
-  $gerente->setSenha($data->senha);
+  if (!empty($data->senha)) {
+    $gerente->setSenha($data->senha);
+  } else {
+    $gerente->setSenha("senhafraca");
+  }
   $gerente->setSetor($setor);
   if ($admin->createGerente($gerente)) {
     echo json_encode($gerente->getJSON());
