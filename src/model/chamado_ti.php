@@ -58,6 +58,25 @@ class ChamadoTI extends Chamado
     // );
   }
 
+  public function read($populate)
+  {
+    if (parent::read($populate)) {
+      $dao = new ChamadoTIDAO();
+      return $dao->read($this);
+    }
+    return false;
+  }
+
+  public function readBySetor()
+  {
+    $result = parent::readBySetor();
+    $dao = new ChamadoTIDAO();
+    foreach ($result as $chamado) {
+      $dao->read($chamado);
+    }
+    return $result;
+  }
+
   public function setSoftware($software)
   {
     $this->software = $software;

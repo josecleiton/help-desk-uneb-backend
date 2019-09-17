@@ -190,7 +190,7 @@ if ($chamado->read(array("tecnico" => true, "usuario" => true))) {
             ));
             return false;
           }
-          var_dump($novoTecnico);
+          // var_dump($novoTecnico);
           if ($novoTecnico->getSetor() && $novoTecnico->getSetor()->getNome() !== $novoSetor->getNome()) {
             echo json_encode(array(
               "error" => 404,

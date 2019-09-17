@@ -7,13 +7,13 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once(dirname(__FILE__) .  '/../../model/request.php');
-require_once(dirname(__FILE__) .  '/../../model/chamado.php');
+require_once(dirname(__FILE__) .  '/../../model/chamado_ti.php');
 require_once(dirname(__FILE__) .  '/../../model/tecnico.php');
 require_once(dirname(__FILE__) .  '/../../model/situacao.php');
 
 $data = json_decode(file_get_contents("php://input"));
 if (!empty($data->id)) {
-  $chamado = new Chamado($data->id);
+  $chamado = new ChamadoTI($data->id);
   if ($chamado->read(array("tecnico" => true, "usuario" => true))) {
     echo json_encode($chamado->getJSON());
   } else {
