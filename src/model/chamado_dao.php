@@ -1,7 +1,7 @@
 <?php
 require_once("dao.php");
 require_once("chamado.php");
-require_once("chamado_ti.php");
+// require_once("chamado_ti.php");
 require_once("alteracao.php");
 require_once("tecnico.php");
 require_once("usuario.php");

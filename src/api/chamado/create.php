@@ -57,49 +57,69 @@ if (!$usuario->existe()) {
 $setor = new Setor();
 $setor->setNome($_POST["setor_nome"]);
 if ($setor->read()) {
-  if (empty($_POST["ti"])) {
+  if ($_POST["setor_nome"] !== "TI" || empty($_POST["ti"])) {
     $chamado = new Chamado();
-    if (!empty($_POST["problema"])) {
-      $problema = new Problema();
-      $problema->setSetor($setor);
-      $problema->setDescricao($_POST["problema"]);
-      if ($problema->read()) {
-        $chamado->setProblema($problema);
-      } else {
-        echo json_encode(array(
-          "error" => 404,
-          "mensagem" => "Problema não encontrado"
-        ));
-        return false;
-      }
+  } else {
+    if (
+      empty($_POST["software"]) || empty($_POST["plugins"]) || empty($_POST["sala"])
+      || empty($_POST["data_utilizacao"]) || empty($_POST["link"])
+    ) {
+      echo json_encode(array(
+        "error" => 400,
+        "mensagem" => "Campos do módulo de instalação não fornecidos."
+      ));
+      return false;
     }
-    if ($uploader) {
-      try {
-        $chamado->setArquivo($uploader->getCaminho());
-      } catch (\Exception $e) {
-        echo json_encode(array(
-          "error" => 500,
-          "mensagem" => $e->getMessage(),
-        ));
-        return false;
-      }
-    }
-    $chamado->setDescricao($_POST["descricao"]);
-    $chamado->setUsuario($usuario);
-    $chamado->setSetor($setor);
-    if ($k = $chamado->create()) {
-      http_response_code(201);
-      echo json_encode($chamado->getJSON(array(
-        "tecnico" => true
-      )));
+    $chamado = new ChamadoTI();
+    $chamado->setSoftware($_POST["software"]);
+    $chamado->setPlugins($_POST["plugins"]);
+    $chamado->setSala($_POST["sala"]);
+    $chamado->setDataUtilizacao($_POST["data_utilizacao"]);
+    $chamado->setLink($_POST["link"]);
+  }
+  if (!empty($_POST["problema"])) {
+    $problema = new Problema();
+    $problema->setSetor($setor);
+    $problema->setDescricao($_POST["problema"]);
+    if ($problema->read()) {
+      $chamado->setProblema($problema);
     } else {
       echo json_encode(array(
-        "error" => 409,
-        "mensagem" => "Algum erro aconteceu ao criar o chamado.",
-        "o" => $k
+        "error" => 404,
+        "mensagem" => "Problema não encontrado"
       ));
+      return false;
     }
   }
+  if ($uploader) {
+    try {
+      $chamado->setArquivo($uploader->getCaminho());
+    } catch (\Exception $e) {
+      echo json_encode(array(
+        "error" => 500,
+        "mensagem" => $e->getMessage(),
+      ));
+      return false;
+    }
+  }
+  $chamado->setDescricao($_POST["descricao"]);
+  $chamado->setUsuario($usuario);
+  $chamado->setSetor($setor);
+  if ($k = $chamado->create()) {
+    http_response_code(201);
+    echo json_encode($chamado->getJSON(array(
+      "tecnico" => true
+    )));
+  } else {
+    echo json_encode(array(
+      "error" => 409,
+      "mensagem" => "Algum erro aconteceu ao criar o chamado.",
+      "o" => $k
+    ));
+  }
+  // } else {
+
+  // }
 } else {
   echo json_encode(array(
     "error" => 404,

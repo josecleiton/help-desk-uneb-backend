@@ -12,7 +12,10 @@ require_once dirname(__FILE__) . '/../../model/request.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())) {
+if (
+  GerenteSetor::readJWTAndSet(Request::getAuthToken(), $gerente = new GerenteSetor())
+  && $gerente->getSetor()->getID()
+) {
   $setor = $gerente->getSetor();
   if ($setor->read()) {
     echo json_encode($setor->getJSON());

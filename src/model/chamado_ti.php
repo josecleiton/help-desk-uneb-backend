@@ -1,28 +1,100 @@
 <?php
 
 require_once('chamado.php');
+require_once('chamado_ti_dao.php');
 
-class ChamadoTI extends Chamado {
-    private $caminhoDoArquivo;
-    private $descricaoDoArquivo;
-    private $tamanhoDoArquivo;
+class ChamadoTI extends Chamado
+{
+  private $software;
+  private $dataUtilizacao;
+  private $sala;
+  private $link;
+  private $plugins;
 
-    function __constructor($id, $path, $desc, $tam) {
+  public function getSoftware()
+  {
+    return $this->software;
+  }
 
-        parent::__constructor($id);
-        $caminhoDoArquivo = $path;
-        $descricaoDoArquivo = $desc;
-        $tamanhoDoArquivo = $tam;
+  public function getDataUtilizacao()
+  {
+    return $this->dataUtilizacao;
+  }
+
+  public function getSala()
+  {
+    return $this->sala;
+  }
+
+  public function getLink()
+  {
+    return $this->link;
+  }
+
+  public function getPlugins()
+  {
+    return $this->plugins;
+  }
+
+  public function getJSON($nullVal = array())
+  {
+    $chamadoJSON = parent::getJSON($nullVal);
+    if ($this->software) {
+      $chamadoJSON["software"] = $this->software;
+      $chamadoJSON["data_utilizacao"] = $this->software;
+      $chamadoJSON["sala"] = $this->sala;
+      $chamadoJSON["link"] = $this->link;
+      $chamadoJSON["plugins"] = $this->plugins;
     }
+    return $chamadoJSON;
 
-    public function download() {
+    // array_push($chamadoJSON,
+    //   "software" => $this->software,
+    //   "data_utilizacao" => $dataUtilizacao,
+    //   "sala" => $this->sala,
+    //   "link" => $this->link,
+    //   "plugins" => $this->plugins,
 
+    // );
+  }
+
+  public function setSoftware($software)
+  {
+    $this->software = $software;
+  }
+
+  public function setDataUtilizacao($dataUtilizacao)
+  {
+    $this->dataUtilizacao = $dataUtilizacao;
+  }
+
+  public function setLink($link)
+  {
+    $this->link = $link;
+  }
+
+  public function setSala($sala)
+  {
+    $this->sala = $sala;
+  }
+
+  public function setPlugins($plugins)
+  {
+    $this->plugins = $plugins;
+  }
+
+  public function download()
+  { }
+
+  public function info()
+  { }
+
+  public function create()
+  {
+    if (parent::create()) {
+      $dao = new ChamadoTIDAO();
+      return $dao->create($this);
     }
-
-    public function info() {
-        
-    }
-    
+    return false;
+  }
 }
-
-?>
