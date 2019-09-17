@@ -65,4 +65,9 @@ class Problema
     $dao = new ProblemaDAO();
     return $dao->read($this);
   }
+  public function delete()
+  {
+    $dao = new ProblemaDAO();
+    return $dao->delete($this);
+  }
 }
