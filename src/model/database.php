@@ -1,16 +1,21 @@
 <?php
 
+require_once dirname(__file__) . "/../vendor/autoload.php";
+
 use Dotenv\Dotenv;
 use PHPMailer\PHPMailer\Exception;
 
 class Database
 {
   // get the database connection
+  // private static $dotenv = Dotenv::create()
   public static function getConnection()
   {
+    // echo dirname(__FILE__) . '/../';
+    $dotenv = Dotenv::create(dirname(__file__) . '/../');
+    // echo "KKK";
+    $dotenv->load();
     try {
-      $dotenv = Dotenv::create(dirname(__file__) . '/../');
-      $dotenv->load();
       $dotenv->required(['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS']);
     } catch (\Exception $e) {
       echo $e->getMessage();

@@ -182,9 +182,9 @@ class Tecnico extends Usuario
       "logado_em" => time(),
     );
     // echo "KKKK";
+    $dotenv = Dotenv::create(dirname(__file__) . '/../');
+    $dotenv->load();
     try {
-      $dotenv = Dotenv::create(dirname(__file__) . '/../');
-      $dotenv->load();
       $dotenv->required('SECRET_KEY');
     } catch (\Exception $e) {
       echo $e->getMessage();
@@ -195,9 +195,9 @@ class Tecnico extends Usuario
 
   public static function readJWT($jwt)
   {
+    $dotenv = Dotenv::create(dirname(__file__) . '/../');
+    $dotenv->load();
     try {
-      $dotenv = Dotenv::create(dirname(__file__) . '/../');
-      $dotenv->load();
       $dotenv->required('SECRET_KEY');
     } catch (\Exception $e) {
       echo $e->getMessage();

@@ -16,9 +16,9 @@ class Email
   }
   public function send()
   {
+    $dotenv = Dotenv::create(dirname(__file__) . '/../');
+    $dotenv->load();
     try {
-      $dotenv = Dotenv::create(dirname(__file__) . '/../');
-      $dotenv->load();
       $dotenv->required(
         [
           'MAIL_HOST', 'MAIL_PORT', 'MAIL_MAILER', 'MAIL_SMTPSEC',
