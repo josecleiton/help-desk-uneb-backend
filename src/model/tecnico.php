@@ -2,10 +2,14 @@
 require_once "usuario.php";
 require_once "tecnico_dao.php";
 require_once "chamado.php";
-require_once dirname(__FILE__) . "/../config/env.php";
+// require_once dirname(__FILE__) . "/../config/env.php";
 require_once dirname(__file__) . "/../vendor/autoload.php";
 
+// use Dotenv\Dotenv;
+
+use Dotenv\Dotenv;
 use \Firebase\JWT\JWT;
+use PHPMailer\PHPMailer\Exception;
 
 class Tecnico extends Usuario
 {
@@ -177,15 +181,32 @@ class Tecnico extends Usuario
       "setor" => $setor,
       "logado_em" => time(),
     );
-    return array($token, JWT::encode($token, ENV::getAppKey()));
+    // echo "KKKK";
+    try {
+      $dotenv = Dotenv::create(dirname(__file__) . '/../');
+      $dotenv->load();
+      $dotenv->required('SECRET_KEY');
+    } catch (\Exception $e) {
+      echo $e->getMessage();
+      throw new Exception($e->getMessage());
+    }
+    return array($token, JWT::encode($token, getenv("SECRET_KEY")));
   }
 
   public static function readJWT($jwt)
   {
-    //  var_dump($jwt);
     try {
-      return JWT::decode($jwt, ENV::getAppKey(), array('HS256'));
+      $dotenv = Dotenv::create(dirname(__file__) . '/../');
+      $dotenv->load();
+      $dotenv->required('SECRET_KEY');
     } catch (\Exception $e) {
+      echo $e->getMessage();
+      throw new Exception($e->getMessage());
+    }
+    try {
+      return JWT::decode($jwt, getenv("SECRET_KEY"), array('HS256'));
+    } catch (\Exception $e) {
+      // echo $e->getMessage();
       return false;
     }
   }

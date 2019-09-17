@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . "/../config/database.php");
+require_once("database.php");
 
 class DAO {
    protected $conn;
@@ -10,5 +10,3 @@ class DAO {
       $this->conn = null;
    }
 }
-
-?>
