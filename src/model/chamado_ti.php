@@ -41,7 +41,7 @@ class ChamadoTI extends Chamado
     $chamadoJSON = parent::getJSON($nullVal);
     if ($this->software) {
       $chamadoJSON["software"] = $this->software;
-      $chamadoJSON["data_utilizacao"] = $this->software;
+      $chamadoJSON["data_utilizacao"] = $this->dataUtilizacao;
       $chamadoJSON["sala"] = $this->sala;
       $chamadoJSON["link"] = $this->link;
       $chamadoJSON["plugins"] = $this->plugins;

@@ -42,18 +42,20 @@ class ChamadoTIDAO extends ChamadoDAO
     if ($resultadoDB->rowCount()) {
       // var_dump($chamado);
       $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
-      if (row["ti"]) {
+      if ($row["ti"]) {
         $resultadoDB = $this->conn->prepare(
           "SELECT * FROM $this->table WHERE id_chamado = $id"
         );
         $resultadoDB->execute();
         if ($resultadoDB->rowCount()) {
           $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+          // echo json_encode($row);
           $chamado->setSoftware($row["software"]);
           $chamado->setDataUtilizacao($row["data_utilizacao"]);
           $chamado->setLink($row["link"]);
           $chamado->setSala($row["sala"]);
           $chamado->setPlugins($row["plugins"]);
+          // var_dump($chamado);
         }
       }
     }

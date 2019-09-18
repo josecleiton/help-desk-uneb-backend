@@ -98,7 +98,7 @@ class Chamado
     return array(
       "id" => $this->getID(),
       "descricao" => $this->getDescricao(),
-      "data" => $this->getData(),
+      // "data" => $this->getData(),
       "alteracoes" => $this->getAlteracoesJSON(),
       "usuario" => array_key_exists("usuario", $nullVal) ? null : $usuario->getJSON(array(
         "chamados" => true
