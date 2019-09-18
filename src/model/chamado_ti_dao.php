@@ -6,49 +6,49 @@ class ChamadoTIDAO extends ChamadoDAO
   private $table = "tchamado_ti";
   public function create($chamado)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "UPDATE tchamado SET ti = 1 WHERE id = :id"
     );
     $id = $chamado->getID();
-    $resultadoDB->bindParam(":id", $id, PDO::PARAM_INT);
-    $resultadoDB->execute();
-    if (!$resultadoDB->rowCount()) return false;
-    $resultadoDB = $this->conn->prepare(
+    $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+    if (!$stmt->rowCount()) return false;
+    $stmt = $this->conn->prepare(
       "INSERT INTO $this->table
        VALUES (:software, :data,
                 :link, :plugins,
                :chamado, :lab)
       "
     );
-    $resultadoDB->bindValue(":software", $chamado->getSoftware(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":data", $chamado->getDataUtilizacao(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":link", $chamado->getLink(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":plugins", $chamado->getPlugins(), PDO::PARAM_STR);
-    $resultadoDB->bindParam(":chamado", $id, PDO::PARAM_INT);
-    $resultadoDB->bindValue(":lab", $chamado->getSala(), PDO::PARAM_INT);
+    $stmt->bindValue(":software", $chamado->getSoftware(), PDO::PARAM_STR);
+    $stmt->bindValue(":data", $chamado->getDataUtilizacao(), PDO::PARAM_STR);
+    $stmt->bindValue(":link", $chamado->getLink(), PDO::PARAM_STR);
+    $stmt->bindValue(":plugins", $chamado->getPlugins(), PDO::PARAM_STR);
+    $stmt->bindParam(":chamado", $id, PDO::PARAM_INT);
+    $stmt->bindValue(":lab", $chamado->getSala(), PDO::PARAM_INT);
 
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt->execute();
+    return $stmt->rowCount();
   }
 
   public function read($chamado)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "SELECT ti FROM tchamado WHERE id = :id"
     );
     $id = $chamado->getID();
-    $resultadoDB->bindParam(":id", $id, PDO::PARAM_INT);
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount()) {
+    $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+    if ($stmt->rowCount()) {
       // var_dump($chamado);
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if ($row["ti"]) {
-        $resultadoDB = $this->conn->prepare(
+        $stmt = $this->conn->prepare(
           "SELECT * FROM $this->table WHERE id_chamado = $id"
         );
-        $resultadoDB->execute();
-        if ($resultadoDB->rowCount()) {
-          $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute();
+        if ($stmt->rowCount()) {
+          $row = $stmt->fetch(PDO::FETCH_ASSOC);
           // echo json_encode($row);
           $chamado->setSoftware($row["software"]);
           $chamado->setDataUtilizacao($row["data_utilizacao"]);

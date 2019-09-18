@@ -7,17 +7,17 @@ class SituacaoDAO extends DAO
   private $table = "tsituacao";
   public function read($situacao)
   {
-    $resultadoDB = null;
+    $stmt = null;
     if ($situacao->getNome()) {
-      $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE nome = :nome");
-      $resultadoDB->bindValue(":nome", $situacao->getNome(), PDO::PARAM_STR);
+      $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE nome = :nome");
+      $stmt->bindValue(":nome", $situacao->getNome(), PDO::PARAM_STR);
     } else {
-      $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id");
-      $resultadoDB->bindValue(":id", $situacao->getID(), PDO::PARAM_INT);
+      $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id");
+      $stmt->bindValue(":id", $situacao->getID(), PDO::PARAM_INT);
     }
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount() == 1) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute();
+    if ($stmt->rowCount() == 1) {
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       $situacao->setID($row["id"]);
       $situacao->setNome($row["nome"]);
       $situacao->setCor("#" . $row["cor"]);
@@ -27,11 +27,11 @@ class SituacaoDAO extends DAO
   }
   public function readAll()
   {
-    $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table");
-    $resultadoDB->execute();
+    $stmt = $this->conn->prepare("SELECT * FROM $this->table");
+    $stmt->execute();
     $situacoes = array();
-    if ($resultadoDB->rowCount()) {
-      while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
+    if ($stmt->rowCount()) {
+      while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
         $novaSituacao = new Situacao($row["id"]);
         $novaSituacao->setNome($row["nome"]);
         $novaSituacao->setCor("#" . $row["cor"]);

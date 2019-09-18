@@ -12,12 +12,12 @@ class ChamadoDAO extends DAO
 {
   private $table = "tchamado";
 
-  protected function read($resultadoDB, $populate = array(), $problema = true)
+  protected function read($stmt, $populate = array(), $problema = true)
   {
     $chamados = array();
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount() > 0) {
-      while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {
+      while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
         $novoChamado = new Chamado($row["id"]);
         $novoChamado->setDescricao($row["descricao"]);
         $novoChamado->setData($row["data"]);
@@ -60,26 +60,26 @@ class ChamadoDAO extends DAO
 
   public function readByUsuario($usuario)
   {
-    $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id_usuario = :usuario");
-    $resultadoDB->bindValue(":usuario", $usuario->getCPF(), PDO::PARAM_STR);
-    return $this->read($resultadoDB, array("tecnico" => true, "usuario" => false, "setor" => true), false);
+    $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE id_usuario = :usuario");
+    $stmt->bindValue(":usuario", $usuario->getCPF(), PDO::PARAM_STR);
+    return $this->read($stmt, array("tecnico" => true, "usuario" => false, "setor" => true), false);
     // QUERY INCOMPLETA
   }
 
   public function readByTecnico($tecnico)
   {
-    $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id_tecnico = :tecnico");
-    $resultadoDB->bindValue(":tecnico", $tecnico->getLogin(), PDO::PARAM_STR);
-    return $this->read($resultadoDB, array("tecnico" => false, "usuario" => true, "setor" => true));
+    $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE id_tecnico = :tecnico");
+    $stmt->bindValue(":tecnico", $tecnico->getLogin(), PDO::PARAM_STR);
+    return $this->read($stmt, array("tecnico" => false, "usuario" => true, "setor" => true));
   }
 
   public function readByID($chamado, $populate = array())
   {
-    $resultadoDB = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id");
-    $resultadoDB->bindValue(":id", $chamado->getID(), PDO::PARAM_INT);
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount()) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+    $stmt = $this->conn->prepare("SELECT * FROM $this->table WHERE id = :id");
+    $stmt->bindValue(":id", $chamado->getID(), PDO::PARAM_INT);
+    $stmt->execute();
+    if ($stmt->rowCount()) {
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       $chamado->setDescricao($row["descricao"]);
       $chamado->setData($row["data"]);
       $chamado->setTombo($row["tombo"]);
@@ -114,51 +114,51 @@ class ChamadoDAO extends DAO
 
   public function readBySetor($chamado)
   {
-    $resultadoDB = null;
+    $stmt = null;
     if (($setor = $chamado->getSetor()) && $setor->getID()) {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT * FROM $this->table
          WHERE id_setor = :setor
         "
       );
       // var_dump($setor);
-      $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+      $stmt->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
     } else {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT * FROM $this->table"
       );
     }
     // var_dump($chamado);
-    return $this->read($resultadoDB, array("tecnico" => true, "usuario" => true, "setor" => true));
+    return $this->read($stmt, array("tecnico" => true, "usuario" => true, "setor" => true));
   }
 
   public function delete($chamado)
   {
-    $resultadoDB = $this->conn->prepare("DELETE FROM $this->table WHERE id = :chamado");
-    $resultadoDB->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
-    // $resultadoDB->debugDumpParams();
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt = $this->conn->prepare("DELETE FROM $this->table WHERE id = :chamado");
+    $stmt->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
+    // $stmt->debugDumpParams();
+    $stmt->execute();
+    return $stmt->rowCount();
   }
 
   public function create($chamado)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "INSERT INTO $this->table (descricao, data, ti, tombo, id_usuario, id_problema, id_setor, arquivo)
                 VALUES (:descricao, :data, :ti, :tombo, :idusuario, :problema, :idsetor, :arquivo)"
     );
-    $resultadoDB->bindValue(":descricao", $chamado->getDescricao(), PDO::PARAM_STR);
+    $stmt->bindValue(":descricao", $chamado->getDescricao(), PDO::PARAM_STR);
     $data = Date("Y-m-d H:i:s");
-    $resultadoDB->bindParam(":data", $data, PDO::PARAM_STR);
-    $resultadoDB->bindValue(":ti", 0, PDO::PARAM_BOOL);
-    $resultadoDB->bindValue(":tombo", $chamado->getTombo(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":idusuario", $chamado->getUsuario()->getCPF(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":idsetor", $chamado->getSetor()->getID(), PDO::PARAM_INT);
+    $stmt->bindParam(":data", $data, PDO::PARAM_STR);
+    $stmt->bindValue(":ti", 0, PDO::PARAM_BOOL);
+    $stmt->bindValue(":tombo", $chamado->getTombo(), PDO::PARAM_STR);
+    $stmt->bindValue(":idusuario", $chamado->getUsuario()->getCPF(), PDO::PARAM_STR);
+    $stmt->bindValue(":idsetor", $chamado->getSetor()->getID(), PDO::PARAM_INT);
     $problema = $chamado->getProblema();
-    $resultadoDB->bindValue(":problema", $problema ? $problema->getID() : null, PDO::PARAM_INT);
-    $resultadoDB->bindValue(":arquivo", $chamado->getArquivo(), PDO::PARAM_STR);
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount()) {
+    $stmt->bindValue(":problema", $problema ? $problema->getID() : null, PDO::PARAM_INT);
+    $stmt->bindValue(":arquivo", $chamado->getArquivo(), PDO::PARAM_STR);
+    $stmt->execute();
+    if ($stmt->rowCount()) {
       $chamado->setID($this->conn->lastInsertId());
       $alteracao = new Alteracao();
       $alteracao->setChamado($chamado);
@@ -178,25 +178,25 @@ class ChamadoDAO extends DAO
 
   public function update($chamado)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "UPDATE $this->table
       SET ti = :ti, tombo = :tombo,
           id_tecnico = :tecnico, id_setor = :setor
       WHERE id = :chamado"
     );
     $tecnico = $chamado->getTecnico();
-    $resultadoDB->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
-    $resultadoDB->bindValue(":tombo", $chamado->getTombo(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":tecnico", $tecnico ? $tecnico->getLogin() : null, PDO::PARAM_STR);
+    $stmt->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":tombo", $chamado->getTombo(), PDO::PARAM_STR);
+    $stmt->bindValue(":tecnico", $tecnico ? $tecnico->getLogin() : null, PDO::PARAM_STR);
     $setor = $chamado->getSetor();
     // var_dump($setor);
-    $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
     if ($setor->getNome() === 'TI') {
-      $resultadoDB->bindValue(":ti", true, PDO::PARAM_BOOL);
+      $stmt->bindValue(":ti", true, PDO::PARAM_BOOL);
     } else {
-      $resultadoDB->bindValue(":ti", false, PDO::PARAM_BOOL);
+      $stmt->bindValue(":ti", false, PDO::PARAM_BOOL);
     }
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt->execute();
+    return $stmt->rowCount();
   }
 }

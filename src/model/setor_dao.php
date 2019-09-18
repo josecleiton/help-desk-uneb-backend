@@ -7,11 +7,11 @@ class SetorDAO extends DAO
 {
   private $table = "tsetor";
 
-  protected function readOne($setor, $resultadoDB, $populateProblema)
+  protected function readOne($setor, $stmt, $populateProblema)
   {
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount() == 1) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute();
+    if ($stmt->rowCount() == 1) {
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if (array_key_exists("nome", $row)) {
         $setor->setNome($row["nome"]);
       }
@@ -34,13 +34,13 @@ class SetorDAO extends DAO
   {
 
     $query = "INSERT INTO $this->table (nome, telefone, email) values (:nome, :telefone, :email)";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->bindValue("nome", $setor->getNome(), PDO::PARAM_STR);
-    $resultadoDB->bindValue("email", $setor->getEmail(), PDO::PARAM_STR);
-    $resultadoDB->bindValue("telefone", $setor->getTelefone(), PDO::PARAM_STR);
-    if ($resultadoDB->execute()) {
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindValue("nome", $setor->getNome(), PDO::PARAM_STR);
+    $stmt->bindValue("email", $setor->getEmail(), PDO::PARAM_STR);
+    $stmt->bindValue("telefone", $setor->getTelefone(), PDO::PARAM_STR);
+    if ($stmt->execute()) {
       $setor->setID($this->conn->lastInsertId());
-      return $resultadoDB->rowCount();
+      return $stmt->rowCount();
     }
     return 0;
   }
@@ -49,16 +49,16 @@ class SetorDAO extends DAO
   {
     // $query = "SELECT nome, telefone, email FROM " . self::TABLE .
     //          " WHERE id = " . $setor->getID();
-    $resultadoDB = $this->conn->prepare("SELECT nome, telefone, email FROM $this->table WHERE id = :id");
-    $resultadoDB->bindValue(":id", $setor->getID(), PDO::PARAM_INT);
-    return $this->readOne($setor, $resultadoDB, $problema);
+    $stmt = $this->conn->prepare("SELECT nome, telefone, email FROM $this->table WHERE id = :id");
+    $stmt->bindValue(":id", $setor->getID(), PDO::PARAM_INT);
+    return $this->readOne($setor, $stmt, $problema);
   }
 
   public function readByNome($setor, $problema)
   {
-    $resultadoDB = $this->conn->prepare("SELECT id,telefone, email FROM $this->table WHERE nome = :nome");
-    $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
-    return $this->readOne($setor, $resultadoDB, $problema);
+    $stmt = $this->conn->prepare("SELECT id,telefone, email FROM $this->table WHERE nome = :nome");
+    $stmt->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
+    return $this->readOne($setor, $stmt, $problema);
   }
 
   public function readByTecnico($setor, $tecnico)
@@ -72,13 +72,13 @@ class SetorDAO extends DAO
                   ON tecnico.id_setor = setor.id
                WHERE tecnico.login = :tecnico
       ";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->bindValue(":tecnico", $tecnico->getLogin());
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindValue(":tecnico", $tecnico->getLogin());
     // var_dump($tecnico);
     // return null;
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount()) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute();
+    if ($stmt->rowCount()) {
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       $setor->setID($row["id"]);
       $setor->setNome($row["nome"]);
       $setor->setTelefone($row["telefone"]);
@@ -95,10 +95,10 @@ class SetorDAO extends DAO
   public function readAll()
   {
     $query = "SELECT * FROM $this->table";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->execute();
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
     $setores = array();
-    while ($row = $resultadoDB->fetch(PDO::FETCH_ASSOC)) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       $setor = new Setor();
       $setor->setID($row["id"]);
       $setor->setNome($row["nome"]);
@@ -116,23 +116,23 @@ class SetorDAO extends DAO
   public function delete($setor)
   {
     // $query = "DELETE FROM " . self::TABLE . " WHERE nome = " . $setor->getNome();
-    $resultadoDB = $this->conn->prepare("DELETE FROM $this->table WHERE nome = :nome");
-    $resultadoDB->bindValue(":nome", $setor->getNome());
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt = $this->conn->prepare("DELETE FROM $this->table WHERE nome = :nome");
+    $stmt->bindValue(":nome", $setor->getNome());
+    $stmt->execute();
+    return $stmt->rowCount();
   }
   public function update($setor)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "UPDATE $this->table 
       SET nome = :nome, email = :email, telefone = :telefone
       WHERE id = :setor"
     );
-    $resultadoDB->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":email", $setor->getEmail(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":telefone", $setor->getTelefone(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt->bindValue(":nome", $setor->getNome(), PDO::PARAM_STR);
+    $stmt->bindValue(":email", $setor->getEmail(), PDO::PARAM_STR);
+    $stmt->bindValue(":telefone", $setor->getTelefone(), PDO::PARAM_STR);
+    $stmt->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->rowCount();
   }
 }

@@ -10,12 +10,12 @@ class AlteracaoDAO extends DAO
   public function readAllByChamado($chamado)
   {
     $query = "SELECT * FROM $this->table WHERE id_chamado = :chamado";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
-    $resultadoDB->execute();
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindValue(":chamado", $chamado->getID(), PDO::PARAM_INT);
+    $stmt->execute();
     $alteracoes = array();
-    if ($resultadoDB->rowCount() > 0) {
-      while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
+    if ($stmt->rowCount() > 0) {
+      while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
         // extract($row);
         $novaAlteracao = new Alteracao($row["id"]);
         $novaAlteracao->setDescricao($row["descricao"]);
@@ -33,7 +33,7 @@ class AlteracaoDAO extends DAO
   public function create($alteracao)
   {
     // var_dump($tecnico);
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "INSERT INTO $this->table (data, descricao, id_chamado, id_situacao, id_prioridade, id_tecnico)
                 VALUES (:data, :descricao, :idchamado, :idsituacao, :idprioridade, :tecnico)"
     );
@@ -41,13 +41,13 @@ class AlteracaoDAO extends DAO
       $data = Date("Y-m-d H:i:s");
     }
     $tecnico = $alteracao->getTecnico();
-    $resultadoDB->bindParam(":data", $data, PDO::PARAM_STR);
-    $resultadoDB->bindValue(":descricao", $alteracao->getDescricao(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);
-    $resultadoDB->bindValue(":idsituacao", $alteracao->getSituacao()->getID(), PDO::PARAM_INT);
-    $resultadoDB->bindValue(":idprioridade", $alteracao->getPrioridade()->getID(), PDO::PARAM_INT);
-    $resultadoDB->bindValue(":tecnico", $tecnico ? $tecnico->getLogin() : null, PDO::PARAM_STR);
-    if ($resultadoDB->execute()) {
+    $stmt->bindParam(":data", $data, PDO::PARAM_STR);
+    $stmt->bindValue(":descricao", $alteracao->getDescricao(), PDO::PARAM_STR);
+    $stmt->bindValue(":idchamado", $alteracao->getChamado()->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":idsituacao", $alteracao->getSituacao()->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":idprioridade", $alteracao->getPrioridade()->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":tecnico", $tecnico ? $tecnico->getLogin() : null, PDO::PARAM_STR);
+    if ($stmt->execute()) {
       $alteracao->setID($this->conn->lastInsertId());
       return true;
     }

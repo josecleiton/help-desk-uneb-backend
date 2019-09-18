@@ -9,27 +9,27 @@ class ProblemaDAO extends DAO
 
   public function create($problema)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "INSERT INTO $this->table (descricao, id_setor)
               VALUES (:descricao, :setor)"
     );
-    $resultadoDB->bindValue(":descricao", $problema->getDescricao(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":setor", $problema->getSetor()->getID(), PDO::PARAM_INT);
-    return $resultadoDB->execute();
+    $stmt->bindValue(":descricao", $problema->getDescricao(), PDO::PARAM_STR);
+    $stmt->bindValue(":setor", $problema->getSetor()->getID(), PDO::PARAM_INT);
+    return $stmt->execute();
   }
 
   public function read($problema)
   {
     if ($problema->getID()) {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT * FROM $this->table
        WHERE id = :id"
       );
       // var_dump($problema);
-      $resultadoDB->bindValue(":id", $problema->getID(), PDO::PARAM_INT);
-      $resultadoDB->execute();
-      if ($resultadoDB->rowCount()) {
-        $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+      $stmt->bindValue(":id", $problema->getID(), PDO::PARAM_INT);
+      $stmt->execute();
+      if ($stmt->rowCount()) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $problema->setDescricao($row["descricao"]);
         $setor = new Setor();
         $setor->setID($row["id_setor"]);
@@ -37,16 +37,16 @@ class ProblemaDAO extends DAO
         return $problema;
       }
     } else {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT id FROM $this->table
          WHERE descricao = :descricao AND id_setor = :setor
         "
       );
-      $resultadoDB->bindValue(":descricao", $problema->getDescricao(), PDO::PARAM_STR);
-      $resultadoDB->bindValue(":setor", $problema->getSetor()->getID(), PDO::PARAM_INT);
-      $resultadoDB->execute();
-      if ($resultadoDB->rowCount()) {
-        $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+      $stmt->bindValue(":descricao", $problema->getDescricao(), PDO::PARAM_STR);
+      $stmt->bindValue(":setor", $problema->getSetor()->getID(), PDO::PARAM_INT);
+      $stmt->execute();
+      if ($stmt->rowCount()) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $problema->setID($row["id"]);
         return $problema;
       }
@@ -57,15 +57,15 @@ class ProblemaDAO extends DAO
   {
     // var_dump($nullVal);
     $setor = $problema->getSetor();
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "SELECT id, descricao
        FROM $this->table
        WHERE id_setor = :setor"
     );
-    $resultadoDB->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
+    $stmt->bindValue(":setor", $setor->getID(), PDO::PARAM_INT);
     $problemas = array();
-    if ($resultadoDB->execute() && $resultadoDB->rowCount()) {
-      while (($row = $resultadoDB->fetch(PDO::FETCH_ASSOC))) {
+    if ($stmt->execute() && $stmt->rowCount()) {
+      while (($row = $stmt->fetch(PDO::FETCH_ASSOC))) {
         $novoProblema = new Problema();
         $novoProblema->setID($row["id"]);
         $novoProblema->setDescricao($row["descricao"]);
@@ -79,13 +79,13 @@ class ProblemaDAO extends DAO
 
   public function delete($problema)
   {
-    $resultadoDB = $this->conn->prepare(
+    $stmt = $this->conn->prepare(
       "DELETE FROM $this->table
        WHERE id = :problema"
     );
     // var_dump($problema);
-    $resultadoDB->bindValue(":problema", $problema->getID(), PDO::PARAM_INT);
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount();
+    $stmt->bindValue(":problema", $problema->getID(), PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->rowCount();
   }
 }

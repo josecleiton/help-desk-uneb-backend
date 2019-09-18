@@ -10,25 +10,25 @@ class UsuarioDAO extends DAO
   {
 
     $query = "INSERT INTO $this->table (cpf, nome, email, telefone) VALUES (:cpf, :nome, :email, :telefone)";
-    $resultadoDB = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
     // var_dump($usuario);
-    $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":nome", $usuario->getNome(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":telefone", $usuario->getTelefone(), PDO::PARAM_STR);
-    return $resultadoDB->execute();
-    // return $resultadoDB->rowCount() == 1;
+    $stmt->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
+    $stmt->bindValue(":nome", $usuario->getNome(), PDO::PARAM_STR);
+    $stmt->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
+    $stmt->bindValue(":telefone", $usuario->getTelefone(), PDO::PARAM_STR);
+    return $stmt->execute();
+    // return $stmt->rowCount() == 1;
   }
 
   public function existe($usuario)
   {
     $query = "SELECT * FROM $this->table WHERE email = :email AND cpf = :cpf";
-    $resultadoDB = $this->conn->prepare($query);
-    $resultadoDB->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
-    $resultadoDB->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
-    // var_dump($resultadoDB->debugDumpParams());
-    $resultadoDB->execute();
-    return $resultadoDB->rowCount() == 1;
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindValue(":email", $usuario->getEmail(), PDO::PARAM_STR);
+    $stmt->bindValue(":cpf", $usuario->getCPF(), PDO::PARAM_STR);
+    // var_dump($stmt->debugDumpParams());
+    $stmt->execute();
+    return $stmt->rowCount() == 1;
   }
 
   public function read($usuario, $spread)
@@ -38,22 +38,22 @@ class UsuarioDAO extends DAO
     // $query = "SELECT * FROM tusuario " . 
     //          " WHERE " . (($cpfUsuario) ? ("cpf = " . $cpfUsuario) :
     //                      ("email = '" . $usuario->getEmail() . "'"));
-    $resultadoDB = null;
+    $stmt = null;
     if ($cpfUsuario) {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT * FROM $this->table WHERE cpf = :cpf"
       );
-      $resultadoDB->bindParam(":cpf",  $cpfUsuario, PDO::PARAM_STR);
+      $stmt->bindParam(":cpf",  $cpfUsuario, PDO::PARAM_STR);
     } else {
-      $resultadoDB = $this->conn->prepare(
+      $stmt = $this->conn->prepare(
         "SELECT * FROM $this->table WHERE email = :email"
       );
-      $resultadoDB->bindValue(":email",  $usuario->getEmail(), PDO::PARAM_STR);
+      $stmt->bindValue(":email",  $usuario->getEmail(), PDO::PARAM_STR);
     }
-    // $resultadoDB->debugDumpParams();
-    $resultadoDB->execute();
-    if ($resultadoDB->rowCount() == 1) {
-      $row = $resultadoDB->fetch(PDO::FETCH_ASSOC);
+    // $stmt->debugDumpParams();
+    $stmt->execute();
+    if ($stmt->rowCount() == 1) {
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if ($cpfUsuario)
         $usuario->setEmail($row["email"]);
       else
