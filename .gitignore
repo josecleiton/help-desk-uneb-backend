@@ -2,3 +2,4 @@ vendor/
 composer.lock
 src/images
 .env
+index.php
